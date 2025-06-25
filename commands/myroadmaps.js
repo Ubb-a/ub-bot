@@ -8,6 +8,7 @@ module.exports = {
     usage: '!myroadmaps',
     
     async execute(message, args) {
+        try {
         const member = message.member;
         const guildId = message.guild.id;
         
@@ -68,8 +69,9 @@ module.exports = {
             inline: false
         });
         
-        return message.reply({ embeds: [embed] }).catch(err => {
-            console.error('Error sending myroadmaps response:', err);
-        });
+        await message.reply({ embeds: [embed] });
+        } catch (err) {
+            console.error('Error in myroadmaps command:', err);
+        }
     }
 };

@@ -100,6 +100,7 @@ This is a Discord bot application designed to manage role-based roadmaps within 
   - Fixed error handling to prevent duplicate error messages
   - Added quick command listing when user types just "!"
   - Added unknown command handling with helpful suggestions
+  - Fixed duplicate reply issue in all commands with proper try-catch blocks
   - Added JSON data persistence with backup functionality
   - Configured Express web server for monitoring and API endpoints
   - Successfully connected Discord bot with proper intents

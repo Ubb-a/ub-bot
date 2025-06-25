@@ -84,7 +84,7 @@ client.on('messageCreate', async (message) => {
 
     try {
         // Execute command
-        await command.execute(message, args, client);
+        return await command.execute(message, args, client);
     } catch (error) {
         console.error(`Error executing command ${commandName}:`, error);
         

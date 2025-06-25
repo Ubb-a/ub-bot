@@ -8,6 +8,7 @@ module.exports = {
     usage: '!create <roadmap_name> role:@<rolename>',
     
     async execute(message, args) {
+        try {
         // Check if user has manage roles permission
         if (!message.member.permissions.has('ManageRoles')) {
             const errorEmbed = new EmbedBuilder()
@@ -150,6 +151,9 @@ module.exports = {
                 .setDescription('حدث خطأ أثناء إنشاء خريطة الطريق. حاول مرة أخرى.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
+        }
+        } catch (err) {
+            console.error('Error in create command:', err);
         }
     }
 };

@@ -8,6 +8,7 @@ module.exports = {
     usage: '!showroadmap <roadmap_name>',
     
     async execute(message, args) {
+        try {
         // Check if roadmap name is provided
         if (args.length === 0) {
             const errorEmbed = new EmbedBuilder()
@@ -147,8 +148,9 @@ module.exports = {
             });
         }
         
-        return message.reply({ embeds: [embed] }).catch(err => {
-            console.error('Error sending showroadmap response:', err);
-        });
+        await message.reply({ embeds: [embed] });
+        } catch (err) {
+            console.error('Error in showroadmap command:', err);
+        }
     }
 };
