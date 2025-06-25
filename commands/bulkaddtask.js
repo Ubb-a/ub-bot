@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'bulkaddtask',
     description: 'Add multiple tasks to a roadmap at once',
-    usage: 'bulkaddtask <roadmap_name> , <task1> , <task2> , <task3>',
+    usage: 'bulkaddtask <roadmap_name> <week_number> , <task1> , <task2> , <task3>',
     
     async execute(message, args) {
         try {
@@ -24,26 +24,51 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Missing Arguments')
-                    .setDescription('**Usage:** `bulkaddtask roadmap_name | task1 | task2 | task3`\n**Example:** `bulkaddtask backend | Learn Node.js | Setup Database | Create API`')
+                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number , task1 , task2 , task3`\n**Example:** `bulkaddtask backend 2 , Learn Node.js , Setup Database , Create API`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Parse input using | as separator
+            // Parse input using comma as separator
             const fullInput = args.join(' ');
-            const parts = fullInput.split(',').map(part => part.trim());
-
-            if (parts.length < 2) {
+            
+            // Split by first space to separate roadmap+week from the rest
+            const firstSpaceIndex = fullInput.indexOf(' ');
+            if (firstSpaceIndex === -1) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Wrong Format')
-                    .setDescription('Use , to separate roadmap name and tasks\n**Usage:** `bulkaddtask roadmap_name , task1 , task2 , task3`')
+                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number , task1 , task2`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            const roadmapName = parts[0];
-            const taskTitles = parts.slice(1).filter(task => task.length > 0);
+            const roadmapAndWeek = fullInput.substring(0, firstSpaceIndex).trim();
+            const taskParts = fullInput.substring(firstSpaceIndex + 1).split(',').map(part => part.trim());
+
+            // Parse roadmap name and week number
+            const roadmapWeekParts = roadmapAndWeek.split(' ');
+            if (roadmapWeekParts.length < 2) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(COLORS.RED)
+                    .setTitle('❌ Wrong Format')
+                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number , task1 , task2`')
+                    .setTimestamp();
+                return message.reply({ embeds: [errorEmbed] });
+            }
+
+            const weekNumber = parseInt(roadmapWeekParts.pop());
+            const roadmapName = roadmapWeekParts.join(' ');
+            const taskTitles = taskParts.filter(task => task.length > 0);
+
+            if (isNaN(weekNumber) || weekNumber < 1 || weekNumber > 52) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(COLORS.RED)
+                    .setTitle('❌ Invalid Week Number')
+                    .setDescription('Week number must be between 1 and 52.')
+                    .setTimestamp();
+                return message.reply({ embeds: [errorEmbed] });
+            }
 
             if (taskTitles.length === 0) {
                 const errorEmbed = new EmbedBuilder()
@@ -109,9 +134,12 @@ module.exports = {
                 const newTask = {
                     id: currentTaskId,
                     title: taskTitle,
+                    description: taskTitle, // Use title as description for bulk add
                     emoji: taskEmoji,
                     status: 'pending',
                     createdBy: message.author.id,
+                    weekNumber: weekNumber,
+                    createdAt: new Date().toISOString(),
                     completedBy: [],
                     hiddenBy: []
                 };

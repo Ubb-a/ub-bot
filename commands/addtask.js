@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'addtask',
     description: 'Add a new task to a roadmap',
-    usage: 'addtask <roadmap_name> | <task_title> | <task_description> | <week_number>',
+    usage: 'addtask <roadmap_name> <week_number> , <task_title> , <task_description>',
     
     async execute(message, args) {
         try {
@@ -24,25 +24,51 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ معلومات ناقصة')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev | تعلم HTML | أساسيات HTML | 1\`\n\n**ملاحظة:** رقم الأسبوع اختياري، لو مكتبتوش هيتحط في الأسبوع الأول.`)
+                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 , تعلم HTML , أساسيات HTML\`\n\n**ملاحظة:** رقم الأسبوع مطلوب من 1 لـ 52.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
             const fullArgs = args.join(' ');
-            const parts = fullArgs.split(' | ');
-
-            if (parts.length < 3 || parts.length > 4) {
+            
+            // Split by first space to separate roadmap+week from the rest
+            const firstSpaceIndex = fullArgs.indexOf(' ');
+            if (firstSpaceIndex === -1) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ استخدام خاطئ')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev | تعلم HTML | أساسيات HTML | 2\`\n\n**ملاحظة:** رقم الأسبوع اختياري`)
+                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 , تعلم HTML , أساسيات HTML\``)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            const [roadmapName, taskTitle, taskDescription, weekStr] = parts.map(part => part.trim());
-            const weekNumber = weekStr ? parseInt(weekStr) : 1;
+            const roadmapAndWeek = fullArgs.substring(0, firstSpaceIndex).trim();
+            const taskParts = fullArgs.substring(firstSpaceIndex + 1).split(',').map(part => part.trim());
+
+            // Parse roadmap name and week number
+            const roadmapWeekParts = roadmapAndWeek.split(' ');
+            if (roadmapWeekParts.length < 2) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(COLORS.RED)
+                    .setTitle('❌ استخدام خاطئ')
+                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 , تعلم HTML , أساسيات HTML\``)
+                    .setTimestamp();
+                return message.reply({ embeds: [errorEmbed] });
+            }
+
+            const weekNumber = parseInt(roadmapWeekParts.pop()); // Last part is week number
+            const roadmapName = roadmapWeekParts.join(' '); // Rest is roadmap name
+
+            if (taskParts.length < 2) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(COLORS.RED)
+                    .setTitle('❌ استخدام خاطئ')
+                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 , تعلم HTML , أساسيات HTML\``)
+                    .setTimestamp();
+                return message.reply({ embeds: [errorEmbed] });
+            }
+
+            const [taskTitle, taskDescription] = taskParts;
 
             // Validate inputs
             if (!roadmapName || !taskTitle || !taskDescription) {
