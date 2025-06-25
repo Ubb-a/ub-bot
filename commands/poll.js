@@ -17,18 +17,18 @@ module.exports = {
             if (args.length < 3) {
                 const errorEmbed = createErrorEmbed(
                     'معلومات ناقصة',
-                    '**الاستخدام:** `poll <السؤال> | <خيار1> | <خيار2> | ...`\n\n**مثال:** `poll إيه أحسن لغة برمجة؟ | JavaScript | Python | Java`'
+                    '**الاستخدام:** `poll <السؤال> , <خيار1> , <خيار2> , ...`\n\n**مثال:** `poll إيه أحسن لغة برمجة؟ , JavaScript , Python , Java`'
                 );
                 return message.reply({ embeds: [errorEmbed] });
             }
 
             const input = args.join(' ');
-            const parts = input.split('|').map(part => part.trim());
+            const parts = input.split(',').map(part => part.trim());
             
             if (parts.length < 3) {
                 const errorEmbed = createErrorEmbed(
                     'خيارات قليلة',
-                    'محتاج على الأقل سؤال وخيارين للاستطلاع.\n\n**مثال:** `poll إيه أحسن لغة؟ | JavaScript | Python`'
+                    'محتاج على الأقل سؤال وخيارين للاستطلاع.\n\n**مثال:** `poll إيه أحسن لغة؟ , JavaScript , Python`'
                 );
                 return message.reply({ embeds: [errorEmbed] });
             }
