@@ -131,8 +131,11 @@ This is a Discord bot application designed to manage role-based roadmaps within 
   - Bot is online and serving Discord servers
   - **NEW**: Added Arabic response feature for "زعزوع" mentions
     - Bot automatically detects "زعزوع" in any message (case-insensitive)
+    - Only responds when ub.d user is not active in channel (no messages in last 2 minutes)
     - Responds with custom message indicating person is sleeping/tired and will reply when back
     - Automatically finds and mentions ub.d user in the server
+    - Added duplicate response prevention with 10-second cooldown per channel
+    - Uses message history check instead of presence data (no privileged intents required)
     - Works independently of command system
 
 ## Changelog

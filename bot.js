@@ -14,6 +14,27 @@ const client = new Client({
 // Initialize commands collection
 client.commands = new Collection();
 
+// Track recent responses to prevent duplicates
+const recentResponses = new Set();
+
+// Function to check if user has been active recently
+async function checkIfUserActiveRecently(channel, userId) {
+    try {
+        const messages = await channel.messages.fetch({ limit: 50 });
+        const twoMinutesAgo = Date.now() - (2 * 60 * 1000); // 2 minutes ago
+        
+        // Check if user sent any message in the last 2 minutes
+        const recentMessage = messages.find(msg => 
+            msg.author.id === userId && msg.createdTimestamp > twoMinutesAgo
+        );
+        
+        return !!recentMessage;
+    } catch (error) {
+        console.error('Error checking user activity:', error);
+        return false; // If we can't check, assume not active
+    }
+}
+
 // Load commands from commands directory
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
@@ -48,17 +69,39 @@ client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;
     
-    // Check for "زعزوع" mention and respond
+    // Check for "زعزوع" mention and respond only if ub.d is offline
     if (message.content.toLowerCase().includes('زعزوع')) {
         try {
+            // Create unique identifier for this message to prevent duplicates
+            const messageId = `${message.guild.id}-${message.channel.id}-${Date.now()}`;
+            
+            // Check if we already responded recently (within 5 seconds)
+            if (recentResponses.has(message.channel.id)) {
+                return;
+            }
+            
             // Try to find ub.d user in the server
             const ubdUser = message.guild.members.cache.find(member => 
                 member.user.username.toLowerCase().includes('ub.d') || 
                 member.displayName.toLowerCase().includes('ub.d')
             );
             
-            const mentionText = ubdUser ? `<@${ubdUser.user.id}>` : '@ub.d';
-            await message.reply(`سيبوه في حاله الراجل نايم او تعبان او ايه مش فاكر كان قايلي ايه بس علي العموم هيرد اول ما يرجع ${mentionText}`);
+            // Check if ub.d is active in the channel recently (last 2 minutes)
+            const isUbdActive = ubdUser && await checkIfUserActiveRecently(message.channel, ubdUser.user.id);
+            
+            // Only respond if ub.d is not found or not active recently
+            if (!ubdUser || !isUbdActive) {
+                // Add to recent responses to prevent duplicates
+                recentResponses.add(message.channel.id);
+                
+                // Remove from set after 10 seconds
+                setTimeout(() => {
+                    recentResponses.delete(message.channel.id);
+                }, 10000);
+                
+                const mentionText = ubdUser ? `<@${ubdUser.user.id}>` : '@ub.d';
+                await message.reply(`سيبوه في حاله الراجل نايم او تعبان او ايه مش فاكر كان قايلي ايه بس علي العموم هيرد اول ما يرجع ${mentionText}`);
+            }
         } catch (error) {
             console.error('Error replying to زعزوع mention:', error);
         }
