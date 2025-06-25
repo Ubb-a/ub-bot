@@ -110,24 +110,44 @@ client.on('messageCreate', async (message) => {
         return;
     }
     
-    // Check if message starts with "يا سمكري", "!" or is a direct command
+    // Check if message starts with "يا سمكري" or is a direct command (no more ! prefix)
     const hasSamkariPrefix = message.content.toLowerCase().startsWith('يا سمكري');
-    const hasPrefix = message.content.startsWith('!');
     const isDirectCommand = client.commands.has(message.content.split(' ')[0].toLowerCase());
     
-    if (!hasSamkariPrefix && !hasPrefix && !isDirectCommand) return;
+    if (!hasSamkariPrefix && !isDirectCommand) return;
 
-    // If user just types "يا سمكري", "!" or "help" show available commands
-    if (message.content.trim().toLowerCase() === 'يا سمكري' || message.content.trim() === '!' || message.content.trim() === 'help') {
+    // If user just types "يا سمكري" or "help" show available commands
+    if (message.content.trim().toLowerCase() === 'يا سمكري' || message.content.trim() === 'help') {
         try {
             const { EmbedBuilder } = require('discord.js');
             
-            const commandList = Array.from(client.commands.keys()).map(cmd => `\`${cmd}\``).join(', ');
+            // Prevent duplicate responses
+            const messageId = `${message.guild.id}-${message.channel.id}-samkari`;
+            if (recentResponses.has(messageId)) {
+                return;
+            }
+            recentResponses.add(messageId);
+            setTimeout(() => recentResponses.delete(messageId), 3000);
             
             const embed = new EmbedBuilder()
                 .setColor(0x5865F2)
                 .setTitle('🔧 يا قلب السمكري - الكوماندات اهي')
-                .setDescription(`**الكوماندات المتاحة:**\n${commandList}\n\n**للمساعدة التفصيلية:** \`يا سمكري help\` أو \`help\``)
+                .setDescription('**الكوماندات المتاحة:**')
+                .addFields(
+                    { name: '📋 help', value: 'دليل المساعدة الكامل مع شرح تفصيلي لكل كوماند', inline: false },
+                    { name: '🗺️ create', value: 'إنشاء خريطة طريق جديدة للتعلم أو المشاريع', inline: false },
+                    { name: '✅ addtask', value: 'إضافة مهمة جديدة لخريطة الطريق', inline: false },
+                    { name: '📦 bulkaddtask', value: 'إضافة عدة مهام مرة واحدة (منفصلة بـ |)', inline: false },
+                    { name: '📝 tasks', value: 'عرض جميع المهام مع الأرقام للمتابعة', inline: false },
+                    { name: '✔️ done', value: 'تسجيل إتمام مهمة برقمها (مثال: done 2)', inline: false },
+                    { name: '📊 taskstats', value: 'إحصائيات المهام والمتابعة (للإدارة)', inline: false },
+                    { name: '🗂️ myroadmaps', value: 'عرض خرائط الطريق المتاحة لك', inline: false },
+                    { name: '👁️ showroadmap', value: 'عرض تفاصيل خريطة طريق معينة', inline: false },
+                    { name: '🧹 clear', value: 'مسح الرسائل من المحادثة (للإدارة)', inline: false },
+                    { name: '💬 dm', value: 'إرسال رسالة خاصة لأصحاب رتبة معينة (للإدارة)', inline: false },
+                    { name: '🗑️ deleteroadmap', value: 'حذف خريطة طريق نهائياً (للإدارة)', inline: false }
+                )
+                .setFooter({ text: 'استخدم: يا سمكري [اسم الكوماند] أو مباشرة [اسم الكوماند]' })
                 .setTimestamp();
             
             await message.reply({ embeds: [embed] });
@@ -143,8 +163,6 @@ client.on('messageCreate', async (message) => {
         // Remove "يا سمكري " from the beginning
         content = content.toLowerCase().replace(/^يا سمكري\s*/, '').trim();
         if (!content) return; // If nothing after "يا سمكري", we already handled it above
-    } else if (hasPrefix) {
-        content = content.slice(1).trim(); // Remove ! prefix
     } else {
         content = content.trim(); // Direct command
     }

@@ -10,83 +10,83 @@ module.exports = {
         try {
             const helpEmbed = new EmbedBuilder()
             .setColor(COLORS.BLURPLE)
-            .setTitle('🤖 Bot Guide - Roadmaps')
-            .setDescription('Hello! I\'m a roadmap management bot. I can help you create and manage custom learning roadmaps for your server members.')
+            .setTitle('🤖 السمكري - دليل المساعدة')
+            .setDescription('أهلاً! أنا بوت إدارة خرائط الطريق. أقدر أساعدك تنشئ وتدير خرائط تعليمية مخصصة لأعضاء السيرفر.')
             .addFields(
                 {
-                    name: '🗺️ create <roadmap_name> <@role>',
-                    value: 'Create a new roadmap linked to a specific role\n**Example:** `create web-dev @Developer`',
+                    name: '🗺️ create <اسم_الخريطة> <@الرتبة>',
+                    value: 'إنشاء خريطة طريق جديدة مربوطة برتبة معينة\n**مثال:** `create web-dev @Developer`',
                     inline: false
                 },
                 {
                     name: '📋 myroadmaps',
-                    value: 'Show all roadmaps you have access to',
+                    value: 'عرض جميع خرائط الطريق المتاحة لك',
                     inline: false
                 },
                 {
-                    name: '🔍 showroadmap <roadmap_name>',
-                    value: 'Show details of a specific roadmap with progress bar\n**Example:** `showroadmap web-dev`',
+                    name: '🔍 showroadmap <اسم_الخريطة>',
+                    value: 'عرض تفاصيل خريطة طريق معينة مع شريط التقدم\n**مثال:** `showroadmap web-dev`',
                     inline: false
                 },
                 {
                     name: '❓ help',
-                    value: 'Show this command list and help',
+                    value: 'عرض قائمة الأوامر والمساعدة',
                     inline: false
                 },
                 {
-                    name: '📝 addtask <roadmap> <task_title>',
-                    value: 'Add a new task to a roadmap\n**Example:** `addtask backend Learn JavaScript`',
+                    name: '📝 addtask <الخريطة> <عنوان_المهمة>',
+                    value: 'إضافة مهمة جديدة لخريطة الطريق\n**مثال:** `addtask backend تعلم JavaScript`',
                     inline: false
                 },
                 {
-                    name: '📝 bulkaddtask <roadmap> | <task1> | <task2>',
-                    value: 'Add multiple tasks at once (admin only)\n**Example:** `bulkaddtask backend | Learn Node.js | Setup DB | Create API`',
+                    name: '📝 bulkaddtask <الخريطة> | <مهمة1> | <مهمة2>',
+                    value: 'إضافة عدة مهام مرة واحدة (للإدارة فقط)\n**مثال:** `bulkaddtask backend | تعلم Node.js | إعداد قاعدة البيانات | إنشاء API`',
                     inline: false
                 },
                 {
-                    name: '📋 tasks [roadmap_name]',
-                    value: 'Show all tasks numbered from 1 to N. If you have one roadmap, no need to specify name\n**Example:** `tasks` or `tasks backend`',
+                    name: '📋 tasks [اسم_الخريطة]',
+                    value: 'عرض جميع المهام مرقمة من 1 إلى N. إذا كان لك خريطة واحدة، لا حاجة لتحديد الاسم\n**مثال:** `tasks` أو `tasks backend`',
                     inline: false
                 },
                 {
-                    name: '✅ done <task_number> [roadmap_name]',
-                    value: 'Mark a task as completed by number\n**Example:** `done 2` or `done 3 backend`',
+                    name: '✅ done <رقم_المهمة> [اسم_الخريطة]',
+                    value: 'تسجيل إتمام مهمة برقمها\n**مثال:** `done 2` أو `done 3 backend`',
                     inline: false
                 },
                 {
-                    name: '📊 taskstats <roadmap_name>',
-                    value: 'Show member task interaction statistics (admin only)\n**Shows:** who completed which tasks',
+                    name: '📊 taskstats <اسم_الخريطة>',
+                    value: 'عرض إحصائيات تفاعل الأعضاء مع المهام (للإدارة فقط)\n**يعرض:** من أتم أي مهام',
                     inline: false
                 },
                 {
-                    name: '🧹 clear [number]',
-                    value: 'Clear chat messages (admin only)\n**Example:** `clear 10` or `clear` (deletes last 5)',
+                    name: '🧹 clear [عدد]',
+                    value: 'مسح رسائل المحادثة (للإدارة فقط)\n**مثال:** `clear 10` أو `clear` (يحذف آخر 5)',
                     inline: false
                 },
                 {
-                    name: '📬 dm <@role> <message>',
-                    value: 'Send private message to all users with a specific role (admin only)\n**Example:** `dm @Developer Check the new tasks!`',
+                    name: '📬 dm <@الرتبة> <الرسالة>',
+                    value: 'إرسال رسالة خاصة لجميع أصحاب رتبة معينة (للإدارة فقط)\n**مثال:** `dm @Developer شوفوا المهام الجديدة!`',
                     inline: false
                 },
                 {
-                    name: '🗑️ deleteroadmap <roadmap_name>',
-                    value: 'Delete a roadmap permanently (admin only)\n**Example:** `deleteroadmap backend`',
+                    name: '🗑️ deleteroadmap <اسم_الخريطة>',
+                    value: 'حذف خريطة طريق نهائياً (للإدارة فقط)\n**مثال:** `deleteroadmap backend`',
                     inline: false
                 }
             )
             .addFields({
-                name: '💡 Important Tips',
-                value: '• You need "Manage Roles" permission to create new roadmaps\n• Each roadmap is linked to a specific role\n• Only members with the required role can access the roadmap\n• Use exact roadmap names (case insensitive)\n• Data is automatically saved per server\n• Commands work without the ! prefix',
+                name: '💡 نصائح مهمة',
+                value: '• تحتاج صلاحية "Manage Roles" لإنشاء خرائط جديدة\n• كل خريطة مربوطة برتبة معينة\n• فقط الأعضاء الذين لديهم الرتبة المطلوبة يمكنهم الوصول للخريطة\n• استخدم أسماء الخرائط بدقة\n• البيانات تُحفظ تلقائياً لكل سيرفر\n• الأوامر تعمل بدون علامة "!" أو مع "يا سمكري"',
                 inline: false
             })
             .addFields({
-                name: '🚀 Getting Started',
-                value: '1. Use `create` to create a new roadmap\n2. Use `addtask` to add tasks to the roadmap\n3. Use `tasks` to view numbered tasks\n4. Use `done task_number` to complete tasks\n5. Use `taskstats` to monitor member progress (admin)\n6. Use `showroadmap` to review roadmap details',
+                name: '🚀 كيفية البداية',
+                value: '1. استخدم `create` لإنشاء خريطة جديدة\n2. استخدم `addtask` لإضافة مهام للخريطة\n3. استخدم `tasks` لعرض المهام مرقمة\n4. استخدم `done رقم_المهمة` لإتمام المهام\n5. استخدم `taskstats` لمراقبة تقدم الأعضاء (إدارة)\n6. استخدم `showroadmap` لمراجعة تفاصيل الخريطة',
                 inline: false
             })
             .setTimestamp()
             .setFooter({
-                text: 'Built with Discord.js v14',
+                text: 'السمكري - مطور بـ Discord.js v14',
                 iconURL: message.guild.iconURL({ dynamic: true })
             })
             .setThumbnail(message.client.user.displayAvatarURL({ dynamic: true }));
