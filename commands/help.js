@@ -39,6 +39,11 @@ module.exports = {
                     inline: false
                 },
                 {
+                    name: '📝 bulkaddtask <roadmap> | <task1> | <task2>',
+                    value: 'Add multiple tasks at once (admin only)\n**Example:** `bulkaddtask backend | Learn Node.js | Setup DB | Create API`',
+                    inline: false
+                },
+                {
                     name: '📋 tasks [roadmap_name]',
                     value: 'Show all tasks numbered from 1 to N. If you have one roadmap, no need to specify name\n**Example:** `tasks` or `tasks backend`',
                     inline: false

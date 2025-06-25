@@ -67,6 +67,7 @@ client.on('messageCreate', async (message) => {
                 { name: 'help', value: 'Show complete help guide', inline: true },
                 { name: 'create', value: 'Create new roadmap', inline: true },
                 { name: 'addtask', value: 'Add new task', inline: true },
+                { name: 'bulkaddtask', value: 'Add multiple tasks at once', inline: true },
                 { name: 'tasks', value: 'Show tasks with numbers', inline: true },
                 { name: 'done', value: 'Complete task by number', inline: true },
                 { name: 'taskstats', value: 'Task statistics (admin)', inline: true },
