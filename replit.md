@@ -120,6 +120,10 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Removed ! prefix requirement - commands work with or without !
     - Added clear command for chat management (admin only)
     - Smart role detection for automatic roadmap access
+  - **ENHANCED**: Added admin communication and management tools
+    - Added dm command for sending private messages to all users with specific role
+    - Added deleteroadmap command for permanent roadmap deletion with confirmation
+    - Both commands require "Manage Roles" permission for security
   - Added JSON data persistence with backup functionality
   - Configured Express web server for monitoring and API endpoints
   - Successfully connected Discord bot with proper intents

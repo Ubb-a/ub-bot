@@ -72,7 +72,9 @@ client.on('messageCreate', async (message) => {
                 { name: 'taskstats', value: 'Task statistics (admin)', inline: true },
                 { name: 'myroadmaps', value: 'Show your available roadmaps', inline: true },
                 { name: 'showroadmap', value: 'Show roadmap details', inline: true },
-                { name: 'clear', value: 'Clear chat messages (admin)', inline: true }
+                { name: 'clear', value: 'Clear chat messages (admin)', inline: true },
+                { name: 'dm', value: 'Send private message to role (admin)', inline: true },
+                { name: 'deleteroadmap', value: 'Delete roadmap permanently (admin)', inline: true }
             )
             .setFooter({ text: 'Type help for detailed explanation or use commands without !' })
             .setTimestamp();

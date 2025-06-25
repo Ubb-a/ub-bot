@@ -57,6 +57,16 @@ module.exports = {
                     name: '🧹 clear [number]',
                     value: 'Clear chat messages (admin only)\n**Example:** `clear 10` or `clear` (deletes last 5)',
                     inline: false
+                },
+                {
+                    name: '📬 dm <@role> <message>',
+                    value: 'Send private message to all users with a specific role (admin only)\n**Example:** `dm @Developer Check the new tasks!`',
+                    inline: false
+                },
+                {
+                    name: '🗑️ deleteroadmap <roadmap_name>',
+                    value: 'Delete a roadmap permanently (admin only)\n**Example:** `deleteroadmap backend`',
+                    inline: false
                 }
             )
             .addFields({
