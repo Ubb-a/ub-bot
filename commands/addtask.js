@@ -47,7 +47,7 @@ module.exports = {
             const roadmapName = args[0];
             const weekNumber = parseInt(args[1]);
             
-            // Check for link in the text
+            // Check for link in the text (supports multiple links)
             let taskTitle = args.slice(2).join(' ');
             let taskLink = null;
             
@@ -57,7 +57,7 @@ module.exports = {
                 const afterLink = taskTitle.substring(linkIndex + 5).trim();
                 
                 taskTitle = beforeLink;
-                taskLink = afterLink;
+                taskLink = afterLink; // Can contain multiple links separated by spaces/commas
             }
 
             // Validate inputs

@@ -157,17 +157,22 @@
       "tasks": [
         {
           "id": 1,
-          "title": "البداية",
-          "description": "مرحباً بك في الرود ماب الجديدة! يمكنك إضافة المهام باستخدام أوامر إدارة المهام.",
+          "title": "Internet",
+          "description": "Internet",
+          "link": "https://www.internet.com/",
+          "emoji": "1️⃣",
           "status": "pending",
-          "createdAt": "2025-06-25T15:05:03.238Z",
-          "completedBy": [
-            "550049617564270642"
-          ]
+          "createdBy": "550049617564270642",
+          "weekNumber": 1,
+          "createdAt": "2025-06-25T15:25:52.927Z",
+          "completedBy": [],
+          "hiddenBy": [],
+          "messageId": "1387453756207271938",
+          "channelId": "1377374192735093020"
         }
       ]
     }
   },
-  "lastUpdated": "2025-06-25T15:09:28.001Z",
+  "lastUpdated": "2025-06-25T15:26:49.755Z",
   "version": "1.0.0"
 }
