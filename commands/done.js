@@ -78,7 +78,7 @@ module.exports = {
                     const errorEmbed = new EmbedBuilder()
                         .setColor(COLORS.YELLOW)
                         .setTitle('🤔 Multiple Roadmaps Available')
-                        .setDescription(`You have access to multiple roadmaps: ${roadmapNames}\n\nPlease specify the roadmap name:\n\`done ${taskNumber} roadmap_name\``)
+                        .setDescription(`You have access to multiple roadmaps: ${roadmapNames}\n\nPlease specify the roadmap name:\n\`done ${taskId} roadmap_name\``)
                         .setTimestamp();
                     return message.reply({ embeds: [errorEmbed] });
                 }
@@ -111,11 +111,11 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            if (taskNumber > visibleTasks.length) {
+            if (taskId > visibleTasks.length) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ Task Number Not Found')
-                    .setDescription(`Task number ${taskNumber} doesn't exist. Available tasks: ${visibleTasks.length}`)
+                    .setTitle('❌ Task ID Not Found')
+                    .setDescription(`Task ID ${taskId} doesn't exist. Available tasks: ${visibleTasks.length}`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }

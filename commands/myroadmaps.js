@@ -54,9 +54,9 @@ module.exports = {
                 const completedTasks = roadmap.tasks ? roadmap.tasks.filter(task => task.status === 'completed').length : 0;
                 
                 description += `**${index + 1}.** \`${roadmap.name}\`\n`;
-                description += `   🏷️ **الرول:** ${role ? role.toString() : 'الرول غير موجود'}\n`;
-                description += `   📋 **المهام:** ${completedTasks}/${taskCount} مكتملة\n`;
-                description += `   📅 **تاريخ الإنشاء:** ${new Date(roadmap.createdAt).toLocaleDateString('ar-EG')}\n\n`;
+                description += `   🏷️ **Role:** ${role ? role.toString() : 'Role not found'}\n`;
+                description += `   📋 **Tasks:** ${completedTasks}/${taskCount} completed\n`;
+                description += `   📅 **Created:** ${new Date(roadmap.createdAt).toLocaleDateString('en-US')}\n\n`;
             });
             
             embed.setDescription(description);
@@ -64,8 +64,8 @@ module.exports = {
         
         // Add helpful commands section
         embed.addFields({
-            name: '💡 الأوامر المتاحة',
-            value: '`!showroadmap <اسم>` - شوف تفاصيل الرود ماب\n`!create <اسم> role:@رول` - عمل رود ماب جديدة (محتاج صلاحية إدارة الأدوار)',
+            name: '💡 Available Commands',
+            value: '`!showroadmap <name>` - View roadmap details\n`!create <name> role:@role` - Create new roadmap (requires Manage Roles permission)',
             inline: false
         });
         

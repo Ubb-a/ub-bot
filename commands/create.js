@@ -71,8 +71,8 @@ module.exports = {
         if (!roadmapName.trim()) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ اسم خاطئ للرود ماب')
-                .setDescription('اكتب اسم صحيح للرود ماب من فضلك.')
+                .setTitle('❌ Invalid Roadmap Name')
+                .setDescription('Please enter a valid roadmap name.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -80,8 +80,8 @@ module.exports = {
         if (!roleId) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ رول غير صحيح')
-                .setDescription('لم أجد الرول المطلوب. تأكد من وجود الرول وصحة الاسم.')
+                .setTitle('❌ Invalid Role')
+                .setDescription('Could not find the required role. Make sure the role exists and the name is correct.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -91,8 +91,8 @@ module.exports = {
         if (!role) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ الرول غير موجود')
-                .setDescription('الرول المطلوب غير موجود في هذا السيرفر.')
+                .setTitle('❌ Role Not Found')
+                .setDescription('The required role does not exist in this server.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -104,8 +104,8 @@ module.exports = {
         if (existingRoadmaps[roadmapKey]) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ الرود ماب موجودة فعلا')
-                .setDescription(`رود ماب بالاسم "**${roadmapName}**" موجودة فعلا في السيرفر ده.`)
+                .setTitle('❌ Roadmap Already Exists')
+                .setDescription(`A roadmap named "**${roadmapName}**" already exists in this server.`)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -123,8 +123,8 @@ module.exports = {
             tasks: [
                 {
                     id: 1,
-                    title: 'البداية',
-                    description: 'مرحباً بك في الرود ماب الجديدة! يمكنك إضافة المهام باستخدام أوامر إدارة المهام.',
+                    title: 'Getting Started',
+                    description: 'Welcome to your new roadmap! You can add tasks using the task management commands.',
                     status: 'pending',
                     createdAt: new Date().toISOString()
                 }
@@ -137,8 +137,8 @@ module.exports = {
             
             const successEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
-                .setTitle('✅ تم عمل الرود ماب بنجاح!')
-                .setDescription(`**اسم الرود ماب:** ${roadmapName}\n**الرتبة المطلوبة:** ${role}\n**تم العمل بواسطة:** ${message.author}\n\nالناس اللي عندها رتبة ${role} تقدر توصل للرود ماب دي باستخدام \`!myroadmaps\` و \`!showroadmap ${roadmapName}\``)
+                .setTitle('✅ Roadmap Created Successfully!')
+                .setDescription(`**Roadmap Name:** ${roadmapName}\n**Required Role:** ${role}\n**Created by:** ${message.author}\n\nUsers with the ${role} role can access this roadmap using \`!myroadmaps\` and \`!showroadmap ${roadmapName}\``)
                 .setTimestamp();
             
             return message.reply({ embeds: [successEmbed] });
@@ -147,8 +147,8 @@ module.exports = {
             console.error('Error creating roadmap:', error);
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ فشل في الإنشاء')
-                .setDescription('حصل خطأ وأنت بتعمل الرود ماب. جرب تاني.')
+                .setTitle('❌ Creation Failed')
+                .setDescription('An error occurred while creating the roadmap. Please try again.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }

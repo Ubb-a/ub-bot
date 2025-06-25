@@ -127,7 +127,7 @@ module.exports = {
                 .setTitle('✅ تم جدولة المهمة بنجاح!')
                 .setDescription(`**الرود ماب:** ${roadmapName}\n**المهمة:** ${taskTitle}\n**الوصف:** ${taskDescription}\n**اليوم:** ${dayNames[dayOfWeek.toLowerCase()]}\n\n🔄 المهمة دي هتتضاف تلقائي كل ${dayNames[dayOfWeek.toLowerCase()]}`)
                 .setTimestamp()
-                .setFooter({ text: `معرف الجدولة: ${scheduleId}` });
+                .setFooter({ text: `Schedule ID: ${scheduleId}` });
 
             await message.reply({ embeds: [successEmbed] });
 
@@ -135,8 +135,8 @@ module.exports = {
             console.error('Error in schedule command:', err);
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ حصل خطأ')
-                .setDescription('مقدرتش أجدول المهمة. جرب تاني.')
+                .setTitle('❌ Error Occurred')
+                .setDescription('Could not schedule the task. Please try again.')
                 .setTimestamp();
             await message.reply({ embeds: [errorEmbed] }).catch(console.error);
         }
@@ -152,19 +152,19 @@ module.exports = {
         if (guildTasks.length === 0) {
             const embed = new EmbedBuilder()
                 .setColor(COLORS.YELLOW)
-                .setTitle('📅 المهام المجدولة')
-                .setDescription('مفيش مهام مجدولة في السيرفر ده.')
+                .setTitle('📅 Scheduled Tasks')
+                .setDescription('No scheduled tasks in this server.')
                 .setTimestamp();
             return message.reply({ embeds: [embed] });
         }
 
         const dayNames = {
-            monday: 'الإثنين',
-            tuesday: 'الثلاثاء',
-            wednesday: 'الأربعاء',
-            thursday: 'الخميس',
-            friday: 'الجمعة',
-            saturday: 'السبت',
+            monday: 'Monday',
+            tuesday: 'Tuesday',
+            wednesday: 'Wednesday',
+            thursday: 'Thursday',
+            friday: 'Friday',
+            saturday: 'Saturday',
             sunday: 'الأحد'
         };
 

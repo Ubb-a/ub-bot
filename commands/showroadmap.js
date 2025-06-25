@@ -90,7 +90,7 @@ module.exports = {
             )
             .setTimestamp()
             .setFooter({
-                text: `${message.guild.name} | معرف الرود ماب: ${roadmap.id}`,
+                text: `${message.guild.name} | Roadmap ID: ${roadmap.id}`,
                 iconURL: message.guild.iconURL({ dynamic: true })
             });
         
@@ -101,7 +101,7 @@ module.exports = {
         const progressBar = '█'.repeat(filledLength) + '░'.repeat(emptyLength);
         
         embed.addFields({
-            name: '📈 شريط التقدم',
+            name: '📈 Progress Bar',
             value: `\`${progressBar}\` ${progressPercentage}%`,
             inline: false
         });
