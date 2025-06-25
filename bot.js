@@ -53,10 +53,15 @@ client.on('messageCreate', async (message) => {
     } catch (error) {
         console.error(`Error executing command ${commandName}:`, error);
         
-        const { createErrorEmbed } = require('./utils/embedBuilder');
-        const errorEmbed = createErrorEmbed('Command Error', 'An error occurred while executing this command.');
+        const { EmbedBuilder } = require('discord.js');
+        const { COLORS } = require('./utils/embedBuilder');
+        const errorEmbed = new EmbedBuilder()
+            .setColor(COLORS.RED)
+            .setTitle('❌ خطأ في الأمر')
+            .setDescription('حدث خطأ أثناء تنفيذ هذا الأمر. حاول مرة أخرى.')
+            .setTimestamp();
         
-        await message.reply({ embeds: [errorEmbed] });
+        return message.reply({ embeds: [errorEmbed] }).catch(() => {});
     }
 });
 

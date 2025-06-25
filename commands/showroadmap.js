@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { createErrorEmbed } = require('../utils/embedBuilder');
+const { COLORS } = require('../utils/embedBuilder');
 const { getRoadmaps } = require('../utils/dataManager');
 
 module.exports = {
@@ -10,10 +10,11 @@ module.exports = {
     async execute(message, args) {
         // Check if roadmap name is provided
         if (args.length === 0) {
-            const errorEmbed = createErrorEmbed(
-                'Missing Roadmap Name',
-                `**Usage:** ${this.usage}\n**Example:** \`!showroadmap frontend-development\``
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ اسم الخريطة مفقود')
+                .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!showroadmap تطوير-المواقع\``)
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
         
@@ -28,20 +29,22 @@ module.exports = {
         
         // Check if roadmap exists
         if (!roadmap) {
-            const errorEmbed = createErrorEmbed(
-                'Roadmap Not Found',
-                `No roadmap named "**${roadmapName}**" exists in this server.\n\nUse \`!myroadmaps\` to see available roadmaps.`
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ الخريطة غير موجودة')
+                .setDescription(`لا توجد خريطة طريق بالاسم "**${roadmapName}**" في هذا السيرفر.\n\nاستخدم \`!myroadmaps\` لرؤية الخرائط المتاحة.`)
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
         
         // Check if user has required role
         if (!member.roles.cache.has(roadmap.roleId)) {
             const role = message.guild.roles.cache.get(roadmap.roleId);
-            const errorEmbed = createErrorEmbed(
-                'Access Denied',
-                `You don't have permission to view this roadmap.\n\n**Required Role:** ${role ? role.toString() : 'Role not found'}`
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ ممنوع الوصول')
+                .setDescription(`ليس لديك صلاحية لعرض هذه الخريطة.\n\n**الرول المطلوب:** ${role ? role.toString() : 'الرول غير موجود'}`)
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
         
@@ -59,34 +62,34 @@ module.exports = {
         
         // Create main embed
         const embed = new EmbedBuilder()
-            .setColor('#5865F2') // Discord blurple
+            .setColor(COLORS.BLURPLE)
             .setTitle(`🗺️ ${roadmap.name}`)
-            .setDescription(`**Progress:** ${progressPercentage}% (${completedTasks}/${totalTasks} tasks completed)`)
+            .setDescription(`**التقدم:** ${progressPercentage}% (${completedTasks}/${totalTasks} مهمة مكتملة)`)
             .addFields(
                 {
-                    name: '🏷️ Required Role',
-                    value: role ? role.toString() : 'Role not found',
+                    name: '🏷️ الرول المطلوب',
+                    value: role ? role.toString() : 'الرول غير موجود',
                     inline: true
                 },
                 {
-                    name: '👤 Created By',
-                    value: creator ? creator.tag : 'Unknown User',
+                    name: '👤 تم الإنشاء بواسطة',
+                    value: creator ? creator.tag : 'مستخدم غير معروف',
                     inline: true
                 },
                 {
-                    name: '📅 Created On',
-                    value: new Date(roadmap.createdAt).toLocaleDateString(),
+                    name: '📅 تاريخ الإنشاء',
+                    value: new Date(roadmap.createdAt).toLocaleDateString('ar-EG'),
                     inline: true
                 },
                 {
-                    name: '📊 Task Statistics',
-                    value: `✅ Completed: ${completedTasks}\n🔄 In Progress: ${inProgressTasks}\n⏳ Pending: ${pendingTasks}`,
+                    name: '📊 إحصائيات المهام',
+                    value: `✅ مكتملة: ${completedTasks}\n🔄 قيد التنفيذ: ${inProgressTasks}\n⏳ معلقة: ${pendingTasks}`,
                     inline: false
                 }
             )
             .setTimestamp()
             .setFooter({
-                text: `${message.guild.name} | Roadmap ID: ${roadmap.id}`,
+                text: `${message.guild.name} | معرف الخريطة: ${roadmap.id}`,
                 iconURL: message.guild.iconURL({ dynamic: true })
             });
         
@@ -97,7 +100,7 @@ module.exports = {
         const progressBar = '█'.repeat(filledLength) + '░'.repeat(emptyLength);
         
         embed.addFields({
-            name: '📈 Progress Bar',
+            name: '📈 شريط التقدم',
             value: `\`${progressBar}\` ${progressPercentage}%`,
             inline: false
         });
@@ -128,22 +131,24 @@ module.exports = {
             });
             
             if (tasks.length > maxTasksToShow) {
-                tasksText += `*... and ${tasks.length - maxTasksToShow} more tasks*`;
+                tasksText += `*... و ${tasks.length - maxTasksToShow} مهام أخرى*`;
             }
             
             embed.addFields({
-                name: `📋 Tasks (${Math.min(tasks.length, maxTasksToShow)}/${tasks.length})`,
-                value: tasksText || 'No tasks available.',
+                name: `📋 المهام (${Math.min(tasks.length, maxTasksToShow)}/${tasks.length})`,
+                value: tasksText || 'لا توجد مهام متاحة.',
                 inline: false
             });
         } else {
             embed.addFields({
-                name: '📋 Tasks',
-                value: 'No tasks have been added to this roadmap yet.',
+                name: '📋 المهام',
+                value: 'لم يتم إضافة أي مهام لهذه الخريطة بعد.',
                 inline: false
             });
         }
         
-        await message.reply({ embeds: [embed] });
+        return message.reply({ embeds: [embed] }).catch(err => {
+            console.error('Error sending showroadmap response:', err);
+        });
     }
 };

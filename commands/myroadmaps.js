@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { createErrorEmbed } = require('../utils/embedBuilder');
+const { COLORS } = require('../utils/embedBuilder');
 const { getRoadmaps } = require('../utils/dataManager');
 
 module.exports = {
@@ -29,23 +29,23 @@ module.exports = {
         
         // Create embed response
         const embed = new EmbedBuilder()
-            .setColor('#5865F2') // Discord blurple
-            .setTitle('🗺️ Your Accessible Roadmaps')
+            .setColor(COLORS.BLURPLE)
+            .setTitle('🗺️ خرائط الطريق المتاحة لك')
             .setAuthor({
                 name: message.author.tag,
                 iconURL: message.author.displayAvatarURL({ dynamic: true })
             })
             .setTimestamp()
             .setFooter({
-                text: `${message.guild.name} | Use !showroadmap <name> to view details`,
+                text: `${message.guild.name} | استخدم !showroadmap <اسم> لعرض التفاصيل`,
                 iconURL: message.guild.iconURL({ dynamic: true })
             });
 
         if (accessibleRoadmaps.length === 0) {
-            embed.setDescription('❌ **No roadmaps available**\n\nYou don\'t have access to any roadmaps in this server. Contact an administrator to get the required roles.')
-                .setColor('#ED4245'); // Discord red
+            embed.setDescription('❌ **لا توجد خرائط طريق متاحة**\n\nليس لديك صلاحية للوصول لأي خرائط في هذا السيرفر. اتصل بالإدارة للحصول على الأدوار المطلوبة.')
+                .setColor(COLORS.RED);
         } else {
-            let description = `You have access to **${accessibleRoadmaps.length}** roadmap${accessibleRoadmaps.length === 1 ? '' : 's'}:\n\n`;
+            let description = `لديك صلاحية الوصول إلى **${accessibleRoadmaps.length}** خريطة طريق:\n\n`;
             
             accessibleRoadmaps.forEach((roadmap, index) => {
                 const role = message.guild.roles.cache.get(roadmap.roleId);
@@ -53,9 +53,9 @@ module.exports = {
                 const completedTasks = roadmap.tasks ? roadmap.tasks.filter(task => task.status === 'completed').length : 0;
                 
                 description += `**${index + 1}.** \`${roadmap.name}\`\n`;
-                description += `   🏷️ **Role:** ${role ? role.toString() : 'Role not found'}\n`;
-                description += `   📋 **Tasks:** ${completedTasks}/${taskCount} completed\n`;
-                description += `   📅 **Created:** ${new Date(roadmap.createdAt).toLocaleDateString()}\n\n`;
+                description += `   🏷️ **الرول:** ${role ? role.toString() : 'الرول غير موجود'}\n`;
+                description += `   📋 **المهام:** ${completedTasks}/${taskCount} مكتملة\n`;
+                description += `   📅 **تاريخ الإنشاء:** ${new Date(roadmap.createdAt).toLocaleDateString('ar-EG')}\n\n`;
             });
             
             embed.setDescription(description);
@@ -63,11 +63,13 @@ module.exports = {
         
         // Add helpful commands section
         embed.addFields({
-            name: '💡 Available Commands',
-            value: '`!showroadmap <name>` - View roadmap details\n`!create <name> role:@role` - Create new roadmap (requires Manage Roles)',
+            name: '💡 الأوامر المتاحة',
+            value: '`!showroadmap <اسم>` - عرض تفاصيل الخريطة\n`!create <اسم> role:@رول` - إنشاء خريطة جديدة (يتطلب صلاحية إدارة الأدوار)',
             inline: false
         });
         
-        await message.reply({ embeds: [embed] });
+        return message.reply({ embeds: [embed] }).catch(err => {
+            console.error('Error sending myroadmaps response:', err);
+        });
     }
 };

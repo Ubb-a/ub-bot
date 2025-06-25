@@ -1,4 +1,5 @@
-const { createSuccessEmbed, createErrorEmbed } = require('../utils/embedBuilder');
+const { EmbedBuilder } = require('discord.js');
+const { COLORS } = require('../utils/embedBuilder');
 const { saveRoadmap, getRoadmaps } = require('../utils/dataManager');
 
 module.exports = {
@@ -9,19 +10,21 @@ module.exports = {
     async execute(message, args) {
         // Check if user has manage roles permission
         if (!message.member.permissions.has('ManageRoles')) {
-            const errorEmbed = createErrorEmbed(
-                'Permission Denied',
-                'You need the "Manage Roles" permission to create roadmaps.'
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ ممنوع الوصول')
+                .setDescription('تحتاج صلاحية "إدارة الأدوار" لإنشاء خرائط الطريق.')
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
 
         // Parse arguments
         if (args.length < 2) {
-            const errorEmbed = createErrorEmbed(
-                'Invalid Usage',
-                `**Usage:** ${this.usage}\n**Example:** \`!create frontend-dev role:@Developer\``
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ استخدام خاطئ')
+                .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!create تطوير-المواقع role:@Developer\``)
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
 
@@ -65,28 +68,31 @@ module.exports = {
 
         // Validate inputs
         if (!roadmapName.trim()) {
-            const errorEmbed = createErrorEmbed(
-                'Invalid Roadmap Name',
-                'Please provide a valid roadmap name.'
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ اسم خاطئ للخريطة')
+                .setDescription('من فضلك اكتب اسم صحيح لخريطة الطريق.')
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
 
         if (!roleId) {
-            const errorEmbed = createErrorEmbed(
-                'Invalid Role',
-                'Could not find the specified role. Make sure the role exists and is spelled correctly.'
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ رول غير صحيح')
+                .setDescription('لم أجد الرول المطلوب. تأكد من وجود الرول وصحة الاسم.')
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
 
         // Get role object for validation
         const role = message.guild.roles.cache.get(roleId);
         if (!role) {
-            const errorEmbed = createErrorEmbed(
-                'Role Not Found',
-                'The specified role could not be found in this server.'
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ الرول غير موجود')
+                .setDescription('الرول المطلوب غير موجود في هذا السيرفر.')
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
 
@@ -95,10 +101,11 @@ module.exports = {
         const roadmapKey = `${message.guild.id}_${roadmapName.toLowerCase()}`;
         
         if (existingRoadmaps[roadmapKey]) {
-            const errorEmbed = createErrorEmbed(
-                'Roadmap Exists',
-                `A roadmap named "**${roadmapName}**" already exists in this server.`
-            );
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ الخريطة موجودة بالفعل')
+                .setDescription(`خريطة طريق بالاسم "**${roadmapName}**" موجودة بالفعل في هذا السيرفر.`)
+                .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
 
@@ -115,8 +122,8 @@ module.exports = {
             tasks: [
                 {
                     id: 1,
-                    title: 'Getting Started',
-                    description: 'Welcome to your new roadmap! Add tasks using the task management commands.',
+                    title: 'البداية',
+                    description: 'مرحباً بك في خريطة الطريق الجديدة! يمكنك إضافة المهام باستخدام أوامر إدارة المهام.',
                     status: 'pending',
                     createdAt: new Date().toISOString()
                 }
@@ -127,20 +134,22 @@ module.exports = {
         try {
             saveRoadmap(roadmapKey, roadmap);
             
-            const successEmbed = createSuccessEmbed(
-                'Roadmap Created Successfully! 🗺️',
-                `**Roadmap:** ${roadmapName}\n**Required Role:** ${role}\n**Created by:** ${message.author}\n\nUsers with the ${role} role can now access this roadmap using \`!myroadmaps\` and \`!showroadmap ${roadmapName}\``
-            );
+            const successEmbed = new EmbedBuilder()
+                .setColor(COLORS.GREEN)
+                .setTitle('✅ تم إنشاء خريطة الطريق بنجاح!')
+                .setDescription(`**اسم الخريطة:** ${roadmapName}\n**الرول المطلوب:** ${role}\n**تم الإنشاء بواسطة:** ${message.author}\n\nيمكن للأعضاء الذين لديهم رول ${role} الوصول لهذه الخريطة باستخدام \`!myroadmaps\` و \`!showroadmap ${roadmapName}\``)
+                .setTimestamp();
             
-            await message.reply({ embeds: [successEmbed] });
+            return message.reply({ embeds: [successEmbed] });
             
         } catch (error) {
             console.error('Error creating roadmap:', error);
-            const errorEmbed = createErrorEmbed(
-                'Creation Failed',
-                'An error occurred while creating the roadmap. Please try again.'
-            );
-            await message.reply({ embeds: [errorEmbed] });
+            const errorEmbed = new EmbedBuilder()
+                .setColor(COLORS.RED)
+                .setTitle('❌ فشل في الإنشاء')
+                .setDescription('حدث خطأ أثناء إنشاء خريطة الطريق. حاول مرة أخرى.')
+                .setTimestamp();
+            return message.reply({ embeds: [errorEmbed] });
         }
     }
 };

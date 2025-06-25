@@ -50,6 +50,8 @@ module.exports = {
             })
             .setThumbnail(message.client.user.displayAvatarURL({ dynamic: true }));
 
-        await message.reply({ embeds: [helpEmbed] });
+        return message.reply({ embeds: [helpEmbed] }).catch(err => {
+            console.error('Error sending help response:', err);
+        });
     }
 };
