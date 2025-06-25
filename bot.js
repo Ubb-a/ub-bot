@@ -49,6 +49,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         const member = guild.members.cache.get(user.id);
         
         console.log('🔄 Reaction detected:', reaction.emoji.name, 'from:', user.username);
+        console.log('📝 Message ID:', message.id, 'Guild:', guild.name);
         
         const userId = user.id;
         const emojiName = reaction.emoji.name;
@@ -128,6 +129,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
         } else {
             // Handle task completion - check all tasks with this emoji
             const tasksWithEmoji = targetRoadmap.tasks.filter(task => task.emoji === emojiName);
+            console.log('🔍 Searching for tasks with emoji:', emojiName);
+            console.log('📋 Found tasks:', tasksWithEmoji.map(t => `${t.emoji} ${t.title}`));
             
             if (tasksWithEmoji.length > 0) {
                 // If multiple tasks have same emoji, we need to determine which one from the message context
