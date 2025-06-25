@@ -34,6 +34,109 @@ client.once('ready', () => {
     client.user.setActivity('roadmaps | !help', { type: 'WATCHING' });
 });
 
+// Reaction handler for task interactions
+client.on('messageReactionAdd', async (reaction, user) => {
+    // Ignore bot reactions
+    if (user.bot) return;
+    
+    try {
+        const { getRoadmap, saveRoadmap } = require('./utils/dataManager');
+        const { EmbedBuilder } = require('discord.js');
+        const { COLORS } = require('./utils/embedBuilder');
+        
+        const message = reaction.message;
+        const guild = message.guild;
+        const member = guild.members.cache.get(user.id);
+        
+        // Check if this is a task-related message
+        if (!message.embeds || message.embeds.length === 0) return;
+        
+        const embed = message.embeds[0];
+        const embedTitle = embed.title;
+        
+        // Handle task completion/hiding
+        if (embedTitle && (embedTitle.includes('مهام خريطة') || embedTitle.includes('تم إضافة المهمة'))) {
+            // Find roadmap from embed
+            let roadmapName = '';
+            if (embedTitle.includes('مهام خريطة:')) {
+                roadmapName = embedTitle.split('مهام خريطة: ')[1];
+            } else if (embed.description && embed.description.includes('خريطة الطريق:')) {
+                const lines = embed.description.split('\n');
+                const roadmapLine = lines.find(line => line.includes('خريطة الطريق:'));
+                if (roadmapLine) {
+                    roadmapName = roadmapLine.split('خريطة الطريق: ')[1].split('\n')[0];
+                }
+            }
+            
+            if (!roadmapName) return;
+            
+            const roadmapKey = `${guild.id}_${roadmapName.toLowerCase()}`;
+            const roadmap = getRoadmap(roadmapKey);
+            
+            if (!roadmap) return;
+            
+            // Check if user has required role
+            if (!member.roles.cache.has(roadmap.roleId)) return;
+            
+            const userId = user.id;
+            let updated = false;
+            
+            if (reaction.emoji.name === '✅') {
+                // Mark tasks as completed for this user
+                roadmap.tasks.forEach(task => {
+                    if (!task.completedBy) task.completedBy = [];
+                    if (!task.completedBy.includes(userId)) {
+                        task.completedBy.push(userId);
+                        updated = true;
+                    }
+                });
+                
+                if (updated) {
+                    // Send completion message
+                    const completionEmbed = new EmbedBuilder()
+                        .setColor(COLORS.GREEN)
+                        .setTitle('🎉 تهانينا!')
+                        .setDescription(`لقد قمت بتمييز مهام خريطة "${roadmapName}" كمكتملة!`)
+                        .setTimestamp();
+                    
+                    message.channel.send({ embeds: [completionEmbed] }).catch(console.error);
+                }
+                
+            } else if (reaction.emoji.name === '❌') {
+                // Hide tasks for this user
+                roadmap.tasks.forEach(task => {
+                    if (!task.hiddenBy) task.hiddenBy = [];
+                    if (!task.hiddenBy.includes(userId)) {
+                        task.hiddenBy.push(userId);
+                        updated = true;
+                    }
+                });
+                
+                if (updated) {
+                    // Send hide message
+                    const hideEmbed = new EmbedBuilder()
+                        .setColor(COLORS.YELLOW)
+                        .setTitle('👁️ تم الإخفاء')
+                        .setDescription(`تم إخفاء مهام خريطة "${roadmapName}" من قائمتك الشخصية.`)
+                        .setTimestamp();
+                    
+                    message.channel.send({ embeds: [hideEmbed] }).catch(console.error);
+                }
+            }
+            
+            if (updated) {
+                saveRoadmap(roadmapKey, roadmap);
+            }
+            
+            // Remove user's reaction
+            reaction.users.remove(user.id).catch(console.error);
+        }
+        
+    } catch (err) {
+        console.error('Error handling reaction:', err);
+    }
+});
+
 // Message handler for commands
 client.on('messageCreate', async (message) => {
     // Ignore bot messages
@@ -54,6 +157,8 @@ client.on('messageCreate', async (message) => {
             .addFields(
                 { name: '!help', value: 'عرض دليل المساعدة الكامل', inline: true },
                 { name: '!create', value: 'إنشاء خريطة طريق جديدة', inline: true },
+                { name: '!addtask', value: 'إضافة مهمة جديدة', inline: true },
+                { name: '!tasks', value: 'عرض المهام مع التفاعل', inline: true },
                 { name: '!myroadmaps', value: 'عرض خرائطك المتاحة', inline: true },
                 { name: '!showroadmap', value: 'عرض تفاصيل خريطة معينة', inline: true }
             )

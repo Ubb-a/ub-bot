@@ -101,6 +101,12 @@ This is a Discord bot application designed to manage role-based roadmaps within 
   - Added quick command listing when user types just "!"
   - Added unknown command handling with helpful suggestions
   - Fixed duplicate reply issue in all commands with proper try-catch blocks
+  - **NEW**: Added interactive task management system
+    - !addtask command for adding tasks to roadmaps
+    - !tasks command for viewing tasks with emoji reactions
+    - Reaction system: ✅ mark as completed, ❌ hide from personal view
+    - Personal task completion tracking per user
+    - Task hiding functionality (tasks hidden individually per user)
   - Added JSON data persistence with backup functionality
   - Configured Express web server for monitoring and API endpoints
   - Successfully connected Discord bot with proper intents
