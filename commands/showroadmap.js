@@ -13,8 +13,8 @@ module.exports = {
         if (args.length === 0) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ اسم الرود ماب مفقود')
-                .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!showroadmap تطوير-المواقع\``)
+                .setTitle('❌ Missing Roadmap Name')
+                .setDescription(`**Usage:** ${this.usage}\n**Example:** \`!showroadmap web-dev\``)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -32,8 +32,8 @@ module.exports = {
         if (!roadmap) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ الرود ماب مش موجودة')
-                .setDescription(`مفيش رود ماب بالاسم "**${roadmapName}**" في السيرفر ده.\n\nاستعمل \`!myroadmaps\` عشان تشوف الرود ماب الموجودة.`)
+                .setTitle('❌ Roadmap Not Found')
+                .setDescription(`No roadmap named "**${roadmapName}**" exists in this server.\n\nUse \`!myroadmaps\` to see available roadmaps.`)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -43,8 +43,8 @@ module.exports = {
             const role = message.guild.roles.cache.get(roadmap.roleId);
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ ممنوع الوصول')
-                .setDescription(`مش مسموح ليك تشوف الرود ماب دي.\n\n**الرتبة المطلوبة:** ${role ? role.toString() : 'الرتبة مش موجودة'}`)
+                .setTitle('❌ Access Denied')
+                .setDescription(`You don't have permission to view this roadmap.\n\n**Required Role:** ${role ? role.toString() : 'Role not found'}`)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -65,16 +65,16 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(COLORS.BLURPLE)
             .setTitle(`🗺️ ${roadmap.name}`)
-            .setDescription(`**التقدم:** ${progressPercentage}% (${completedTasks}/${totalTasks} مهمة مكتملة)`)
+            .setDescription(`**Progress:** ${progressPercentage}% (${completedTasks}/${totalTasks} tasks completed)`)
             .addFields(
                 {
-                    name: '🏷️ الرول المطلوب',
-                    value: role ? role.toString() : 'الرول غير موجود',
+                    name: '🏷️ Required Role',
+                    value: role ? role.toString() : 'Role not found',
                     inline: true
                 },
                 {
-                    name: '👤 تم الإنشاء بواسطة',
-                    value: creator ? creator.tag : 'مستخدم غير معروف',
+                    name: '👤 Created by',
+                    value: creator ? creator.tag : 'Unknown user',
                     inline: true
                 },
                 {
@@ -148,23 +148,23 @@ module.exports = {
                 });
                 
                 embed.addFields({
-                    name: `📅 الأسبوع ${weekNum} (${weekTasks.length} مهمة)`,
-                    value: weekText || 'مفيش مهام في الأسبوع ده.',
+                    name: `📅 Week ${weekNum} (${weekTasks.length} tasks)`,
+                    value: weekText || 'No tasks in this week.',
                     inline: false
                 });
             }
             
             if (sortedWeeks.length > 5) {
                 embed.addFields({
-                    name: '📝 ملاحظة',
-                    value: `... و ${sortedWeeks.length - 5} أسابيع أخرى. استعمل \`tasks ${roadmap.name}\` لشوف كل المهام.`,
+                    name: '📝 Note',
+                    value: `... and ${sortedWeeks.length - 5} more weeks. Use \`tasks ${roadmap.name}\` to see all tasks.`,
                     inline: false
                 });
             }
         } else {
             embed.addFields({
-                name: '📋 المهام',
-                value: 'مفيش مهام متضافة للرود ماب دي لسه.',
+                name: '📋 Tasks',
+                value: 'No tasks have been added to this roadmap yet.',
                 inline: false
             });
         }

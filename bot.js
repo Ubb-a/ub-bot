@@ -59,7 +59,7 @@ client.once('ready', () => {
     
     // Set bot presence
     client.user.setPresence({
-        activities: [{ name: 'السمكري هنا علشان يسمكر الدنيا و يهندسها عد معايا عدد 1 شاي و هندل الدنيا ب help', type: 0 }],
+        activities: [{ name: 'Samkari here to organize the world and engineer it, count with me number 1 tea and handle the world with help', type: 0 }],
         status: 'online'
     });
 });
@@ -102,7 +102,7 @@ client.on('messageCreate', async (message) => {
                 }, 10000);
                 
                 const mentionText = ubdUser ? `<@${ubdUser.user.id}>` : '@ub.d';
-                await message.reply(`سيبوه في حاله الراجل نايم او تعبان او ايه مش فاكر كان قايلي ايه بس علي العموم هيرد اول ما يرجع ${mentionText}`);
+                await message.reply(`Leave him alone, the guy is sleeping or tired or something, I don't remember what he told me but anyway he'll reply as soon as he's back ${mentionText}`);
             }
         } catch (error) {
             console.error('Error replying to زعزوع mention:', error);
@@ -131,27 +131,27 @@ client.on('messageCreate', async (message) => {
             
             const embed = new EmbedBuilder()
                 .setColor(0x5865F2)
-                .setTitle('🔧 يا قلب السمكري - الأوامر اهي')
-                .setDescription('**الأوامر الموجودة:**')
+                .setTitle('🔧 Samkari - Available Commands')
+                .setDescription('**Available Commands:**')
                 .addFields(
-                    { name: '📋 help', value: 'دليل المساعدة الكامل مع شرح كل أمر بالتفصيل', inline: false },
-                    { name: '🗺️ create', value: 'عمل رود ماب جديدة للتعلم أو الشغل', inline: false },
-                    { name: '✅ addtask', value: 'زود مهمة جديدة للرود ماب', inline: false },
-                    { name: '📦 bulkaddtask', value: 'إضافة عدة مهام مرة واحدة (منفصلة بـ ,)', inline: false },
-                    { name: '📝 tasks', value: 'شوف كل المهام بالأرقام عشان تتابع', inline: false },
-                    { name: '✔️ done', value: 'خلص مهمة برقمها (زي: done 2)', inline: false },
-                    { name: '📊 taskstats', value: 'إحصائيات المهام والمتابعة (للأدمن)', inline: false },
-                    { name: '🗂️ myroadmaps', value: 'شوف الرود ماب الموجودة عندك', inline: false },
-                    { name: '👁️ showroadmap', value: 'شوف تفاصيل رود ماب معينة', inline: false },
-                    { name: '🧹 clear', value: 'امسح الرسايل من الشات (للأدمن)', inline: false },
-                    { name: '💬 dm', value: 'ابعت رسالة خاصة لناس رتبة معينة (للأدمن)', inline: false },
-                    { name: '🗑️ deleteroadmap', value: 'امسح رود ماب خالص (للأدمن)', inline: false },
-                    { name: '📊 poll', value: 'عمل استطلاع رأي بخيارات متعددة (للأدمن)', inline: false },
-                    { name: '🗳️ vote', value: 'عمل تصويت بسيط موافق/مش موافق (للأدمن)', inline: false },
-                    { name: '📅 schedule', value: 'جدولة مهام أسبوعية للرود ماب (للأدمن)', inline: false },
-                    { name: '🗑️ deletetask', value: 'امسح مهمة معينة وأعد ترتيب الأرقام (بالمنشن أو للأدمن)', inline: false }
+                    { name: '📋 help', value: 'Complete help guide with detailed explanation of each command', inline: false },
+                    { name: '🗺️ create', value: 'Create new roadmap for learning or work', inline: false },
+                    { name: '✅ addtask', value: 'Add new task to roadmap', inline: false },
+                    { name: '📦 bulkaddtask', value: 'Add multiple tasks at once (separated by ,)', inline: false },
+                    { name: '📝 tasks', value: 'View all tasks with numbers for tracking', inline: false },
+                    { name: '✔️ done', value: 'Complete task by its number (like: done 2)', inline: false },
+                    { name: '📊 taskstats', value: 'Task statistics and tracking (admin)', inline: false },
+                    { name: '🗂️ myroadmaps', value: 'View your available roadmaps', inline: false },
+                    { name: '👁️ showroadmap', value: 'View specific roadmap details', inline: false },
+                    { name: '🧹 clear', value: 'Clear chat messages (admin)', inline: false },
+                    { name: '💬 dm', value: 'Send private message to users with specific role (admin)', inline: false },
+                    { name: '🗑️ deleteroadmap', value: 'Delete roadmap completely (admin)', inline: false },
+                    { name: '📊 poll', value: 'Create poll with multiple options (admin)', inline: false },
+                    { name: '🗳️ vote', value: 'Create simple yes/no vote (admin)', inline: false },
+                    { name: '📅 schedule', value: 'Schedule weekly roadmap tasks (admin)', inline: false },
+                    { name: '🗑️ deletetask', value: 'Delete specific task and reorder IDs (mention or admin)', inline: false }
                 )
-                .setFooter({ text: 'استعمل: يا سمكري [اسم الأمر] أو على طول [اسم الأمر]' })
+                .setFooter({ text: 'Use: يا سمكري [command name] or directly [command name]' })
                 .setTimestamp();
             
             await message.reply({ embeds: [embed] });
@@ -186,8 +186,8 @@ client.on('messageCreate', async (message) => {
         const availableCommands = Array.from(client.commands.keys()).slice(0, 5);
         const suggestionEmbed = new EmbedBuilder()
             .setColor(0xFEE75C)
-            .setTitle('❓ أمر مش معروف')
-            .setDescription(`الأمر \`${commandName}\` مش موجود.\n\n**الأوامر الموجودة:**\n${availableCommands.map(cmd => `\`${cmd}\``).join(', ')}\n\nاكتب \`يا سمكري\` عشان تشوف كل الأوامر.`)
+            .setTitle('❓ Unknown Command')
+            .setDescription(`Command \`${commandName}\` not found.\n\n**Available Commands:**\n${availableCommands.map(cmd => `\`${cmd}\``).join(', ')}\n\nType \`يا سمكري\` to see all commands.`)
             .setTimestamp();
         
         return message.reply({ embeds: [suggestionEmbed] }).catch(() => {});
@@ -203,8 +203,8 @@ client.on('messageCreate', async (message) => {
         
         const errorEmbed = new EmbedBuilder()
             .setColor(0xED4245)
-            .setTitle('❌ خطأ في الأمر')
-            .setDescription('حصل خطأ وأنت بتشغل الأمر. جرب تاني.')
+            .setTitle('❌ Command Error')
+            .setDescription('An error occurred while executing the command. Please try again.')
             .setTimestamp();
         
         message.reply({ embeds: [errorEmbed] }).catch(() => {});

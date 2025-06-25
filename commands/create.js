@@ -13,8 +13,8 @@ module.exports = {
         if (!message.member.permissions.has('ManageRoles')) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ ممنوع الوصول')
-                .setDescription('محتاج صلاحية "إدارة الأدوار" عشان تعمل رود ماب.')
+                .setTitle('❌ Access Denied')
+                .setDescription('You need "Manage Roles" permission to create roadmaps.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -23,8 +23,8 @@ module.exports = {
         if (args.length < 2) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ استخدام خاطئ')
-                .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!create تطوير-المواقع role:@Developer\``)
+                .setTitle('❌ Wrong Usage')
+                .setDescription(`**Usage:** ${this.usage}\n**Example:** \`!create web-dev role:@Developer\``)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }

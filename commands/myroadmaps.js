@@ -31,22 +31,22 @@ module.exports = {
         // Create embed response
         const embed = new EmbedBuilder()
             .setColor(COLORS.BLURPLE)
-            .setTitle('🗺️ الرود ماب الموجودة عندك')
+            .setTitle('🗺️ Your Available Roadmaps')
             .setAuthor({
                 name: message.author.tag,
                 iconURL: message.author.displayAvatarURL({ dynamic: true })
             })
             .setTimestamp()
             .setFooter({
-                text: `${message.guild.name} | استخدم !showroadmap <اسم> لعرض التفاصيل`,
+                text: `${message.guild.name} | Use !showroadmap <name> to view details`,
                 iconURL: message.guild.iconURL({ dynamic: true })
             });
 
         if (accessibleRoadmaps.length === 0) {
-            embed.setDescription('❌ **مفيش رود ماب متاحة**\n\nمش مسموح لك توصل لأي رود ماب في السيرفر ده. كلم الأدمن عشان تاخد الرتبة المطلوبة.')
+            embed.setDescription('❌ **No Available Roadmaps**\n\nYou don\'t have access to any roadmaps in this server. Contact an admin to get the required role.')
                 .setColor(COLORS.RED);
         } else {
-            let description = `عندك صلاحية توصل لـ **${accessibleRoadmaps.length}** رود ماب:\n\n`;
+            let description = `You have access to **${accessibleRoadmaps.length}** roadmaps:\n\n`;
             
             accessibleRoadmaps.forEach((roadmap, index) => {
                 const role = message.guild.roles.cache.get(roadmap.roleId);

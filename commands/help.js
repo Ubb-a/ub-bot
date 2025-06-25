@@ -10,37 +10,37 @@ module.exports = {
         try {
             const helpEmbed = new EmbedBuilder()
             .setColor(COLORS.BLURPLE)
-            .setTitle('🤖 السمكري - دليل المساعدة')
-            .setDescription('أهلا وسهلا! أنا بوت إدارة الرود ماب. أقدر أساعدك تعمل وتتحكم في رود ماب تعليمية مخصوصة للي في السيرفر.')
+            .setTitle('🤖 Samkari - Help Guide')
+            .setDescription('Welcome! I am a roadmap management bot. I can help you create and manage educational roadmaps customized for server members.')
             .addFields(
                 {
-                    name: '🗺️ create <اسم_الرود_ماب> <@الرتبة>',
-                    value: 'عمل رود ماب جديدة مربوطة برتبة معينة\n**مثال:** `create web-dev @Developer`',
+                    name: '🗺️ create <roadmap_name> <@role>',
+                    value: 'Create new roadmap linked to specific role\n**Example:** `create web-dev @Developer`',
                     inline: false
                 },
                 {
                     name: '📋 myroadmaps',
-                    value: 'شوف كل الرود ماب الموجودة عندك',
+                    value: 'View all your available roadmaps',
                     inline: false
                 },
                 {
-                    name: '🔍 showroadmap [اسم_الرود_ماب]',
-                    value: 'شوف الرود ماب حسب رتبتك (لو عندك أكتر من واحدة اكتب الاسم)\n**مثال:** `showroadmap` أو `showroadmap web-dev`',
+                    name: '🔍 showroadmap [roadmap_name]',
+                    value: 'View roadmap based on your role (if you have multiple, specify name)\n**Example:** `showroadmap` or `showroadmap web-dev`',
                     inline: false
                 },
                 {
                     name: '❓ help',
-                    value: 'شوف قايمة الأوامر والمساعدة',
+                    value: 'View command list and help',
                     inline: false
                 },
                 {
-                    name: '📊 poll <السؤال> | <خيار1> | <خيار2>',
-                    value: 'عمل استطلاع رأي بخيارات متعددة (للأدمن بس)\n**مثال:** `poll إيه أحسن لغة؟ | JavaScript | Python | Java`',
+                    name: '📊 poll <question> | <option1> | <option2>',
+                    value: 'Create poll with multiple options (admin only)\n**Example:** `poll What\'s the best language? | JavaScript | Python | Java`',
                     inline: false
                 },
                 {
-                    name: '🗳️ vote <السؤال>',
-                    value: 'عمل تصويت بسيط بـ موافق/مش موافق (للأدمن بس)\n**مثال:** `vote هل نغير لون السيرفر؟`',
+                    name: '🗳️ vote <question>',
+                    value: 'Create simple yes/no vote (admin only)\n**Example:** `vote Should we change server color?`',
                     inline: false
                 },
                 {
