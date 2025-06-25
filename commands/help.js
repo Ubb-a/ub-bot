@@ -92,6 +92,11 @@ module.exports = {
                     name: '🗑️ deleteroadmap <roadmap_name>',
                     value: 'Delete roadmap completely (admin only)\n**Example:** `deleteroadmap backend`',
                     inline: false
+                },
+                {
+                    name: '🧹 emptyroadmap <roadmap_name>',
+                    value: 'Empty all tasks from roadmap (admin only)\n**Example:** `emptyroadmap backend`',
+                    inline: false
                 }
             )
             .addFields({

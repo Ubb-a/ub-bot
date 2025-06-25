@@ -190,9 +190,9 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Fixed conflict between task separator and link separator
   - **NEW**: Added emptyroadmap command for roadmap management (June 25, 2025)
     - Admin-only command to empty all tasks from a roadmap
-    - Confirmation dialog with 30-second timeout for safety
+    - Direct execution without confirmation dialog (simplified workflow)
     - Requires "Manage Roles" permission and appropriate role access
-    - Shows task count before deletion for transparency
+    - Shows task count after deletion and added to help command
   - **FIXED**: Tasks command Discord embed character limit error (June 25, 2025)
     - Added automatic text chunking for large task lists
     - Splits long week displays into multiple embed fields

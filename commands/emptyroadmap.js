@@ -55,77 +55,21 @@ module.exports = {
 
             const taskCount = roadmap.tasks.length;
 
-            // Confirmation embed
-            const confirmEmbed = new EmbedBuilder()
-                .setColor(COLORS.YELLOW)
-                .setTitle('⚠️ Confirm Roadmap Empty')
-                .setDescription(`Are you sure you want to empty **${roadmap.name}**?\n\n**This will delete ${taskCount} tasks permanently.**\n\nReact with ✅ to confirm or ❌ to cancel.`)
+            // Empty the roadmap directly
+            roadmap.tasks = [];
+            saveRoadmap(roadmapKey, roadmap);
+
+            const successEmbed = new EmbedBuilder()
+                .setColor(COLORS.GREEN)
+                .setTitle('✅ Roadmap Emptied Successfully!')
+                .setDescription(`**${roadmap.name}** has been emptied.\n\n**Deleted:** ${taskCount} tasks`)
                 .setTimestamp()
                 .setFooter({
-                    text: 'This action cannot be undone',
-                    iconURL: message.guild.iconURL({ dynamic: true })
+                    text: `Emptied by ${message.author.username}`,
+                    iconURL: message.author.displayAvatarURL({ dynamic: true })
                 });
 
-            const confirmMessage = await message.reply({ embeds: [confirmEmbed] });
-            
-            // Add reactions
-            await confirmMessage.react('✅');
-            await confirmMessage.react('❌');
-
-            // Wait for user reaction
-            const filter = (reaction, user) => {
-                return ['✅', '❌'].includes(reaction.emoji.name) && user.id === message.author.id;
-            };
-
-            try {
-                const collected = await confirmMessage.awaitReactions({ 
-                    filter, 
-                    max: 1, 
-                    time: 30000, 
-                    errors: ['time'] 
-                });
-
-                const reaction = collected.first();
-
-                if (reaction.emoji.name === '✅') {
-                    // Empty the roadmap
-                    roadmap.tasks = [];
-                    saveRoadmap(roadmapKey, roadmap);
-
-                    const successEmbed = new EmbedBuilder()
-                        .setColor(COLORS.GREEN)
-                        .setTitle('✅ Roadmap Emptied Successfully!')
-                        .setDescription(`**${roadmap.name}** has been emptied.\n\n**Deleted:** ${taskCount} tasks`)
-                        .setTimestamp()
-                        .setFooter({
-                            text: `Emptied by ${message.author.username}`,
-                            iconURL: message.author.displayAvatarURL({ dynamic: true })
-                        });
-
-                    await confirmMessage.edit({ embeds: [successEmbed] });
-                    await confirmMessage.reactions.removeAll();
-
-                } else {
-                    const cancelEmbed = new EmbedBuilder()
-                        .setColor(COLORS.DARK)
-                        .setTitle('❌ Operation Cancelled')
-                        .setDescription('Roadmap empty operation has been cancelled.')
-                        .setTimestamp();
-
-                    await confirmMessage.edit({ embeds: [cancelEmbed] });
-                    await confirmMessage.reactions.removeAll();
-                }
-
-            } catch (error) {
-                const timeoutEmbed = new EmbedBuilder()
-                    .setColor(COLORS.DARK)
-                    .setTitle('⏰ Confirmation Timeout')
-                    .setDescription('Operation cancelled due to timeout (30 seconds).')
-                    .setTimestamp();
-
-                await confirmMessage.edit({ embeds: [timeoutEmbed] });
-                await confirmMessage.reactions.removeAll();
-            }
+            await message.reply({ embeds: [successEmbed] });
 
         } catch (err) {
             console.error('Error in emptyroadmap command:', err);
