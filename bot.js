@@ -59,7 +59,7 @@ client.once('ready', () => {
     
     // Set bot presence
     client.user.setPresence({
-        activities: [{ name: 'Roadmaps | !help', type: 0 }],
+        activities: [{ name: 'السمكري هنا علشان يسمكر الدنيا و يهندسها عد معايا عدد 1 شاي و هندل الدنيا ب help', type: 0 }],
         status: 'online'
     });
 });
@@ -68,6 +68,27 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;
+    
+    // Check for "يا سمكري" command
+    if (message.content.toLowerCase().includes('يا سمكري')) {
+        try {
+            const { EmbedBuilder } = require('discord.js');
+            const { COLORS } = require('./utils/embedBuilder');
+            
+            const commandList = Array.from(client.commands.keys()).map(cmd => `\`${cmd}\``).join(', ');
+            
+            const embed = new EmbedBuilder()
+                .setColor(COLORS.BLUE)
+                .setTitle('🔧 يا قلب السمكري - الكوماندات اهي')
+                .setDescription(`**الكوماندات المتاحة:**\n${commandList}\n\n**للمساعدة التفصيلية:** \`help\``)
+                .setTimestamp();
+            
+            await message.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error('Error replying to يا سمكري:', error);
+        }
+        return;
+    }
     
     // Check for "زعزوع" mention and respond only if ub.d is offline
     if (message.content.toLowerCase().includes('زعزوع')) {
