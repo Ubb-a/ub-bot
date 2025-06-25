@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'bulkaddtask',
     description: 'Add multiple tasks to a roadmap at once with topics and optional links',
-    usage: 'bulkaddtask <roadmap_name> <week_number> T:<topic> task1 link:url1|url2 , task2 T:<new_topic> task3...',
+    usage: 'bulkaddtask <roadmap_name> <week_number> T:<topic> task1 [link:url1|url2] | task2 | T:<new_topic> task3',
     
     async execute(message, args) {
         try {
@@ -24,7 +24,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Missing Arguments')
-                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number T:<topic> task1 link:url1|url2 , task2 T:<new_topic> task3`\n**Example:** `bulkaddtask backend 2 T:Node.js Learn basics link:url1|url2 , Setup server T:Database Create models`')
+                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number T:<topic> task1 link:url1|url2 | task2 | T:<new_topic> task3`\n**Example:** `bulkaddtask backend 2 T:Node.js Learn basics link:url1|url2 | Setup server | T:Database Create models`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -83,7 +83,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ No Valid Tasks Found')
-                    .setDescription('Please provide tasks in the correct format: T:<topic> task1 link:url1|url2 , task2')
+                    .setDescription('Please provide tasks in the correct format: T:<topic> task1 link:url1|url2 | task2')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -196,43 +196,41 @@ module.exports = {
         const tasks = [];
         let currentTopic = null;
         
-        // Split by comma first to get individual task entries
-        const entries = input.split(',');
+        // Split by pipe (|) to get individual entries
+        const entries = input.split('|').map(entry => entry.trim());
         
         for (let entry of entries) {
-            entry = entry.trim();
             if (!entry) continue;
+            
+            // Check if this entry is just a topic definition
+            if (entry.startsWith('T:') && entry.indexOf(' ') === -1) {
+                currentTopic = entry.substring(2);
+                continue;
+            }
             
             let taskTitle = '';
             let links = [];
             
-            // Check if this entry contains a new topic
-            if (entry.includes('T:')) {
-                const topicStart = entry.indexOf('T:');
-                const topicEnd = entry.indexOf(' ', topicStart);
-                
-                if (topicEnd === -1) {
-                    // Topic is at the end, no task in this entry
-                    currentTopic = entry.substring(topicStart + 2).trim();
-                    continue;
-                } else {
-                    // Extract topic and remove it from entry
-                    currentTopic = entry.substring(topicStart + 2, topicEnd);
-                    entry = entry.substring(0, topicStart) + entry.substring(topicEnd + 1);
-                    entry = entry.trim();
+            // Check if this entry contains a topic at the beginning
+            if (entry.startsWith('T:')) {
+                const spaceIndex = entry.indexOf(' ');
+                if (spaceIndex !== -1) {
+                    currentTopic = entry.substring(2, spaceIndex);
+                    entry = entry.substring(spaceIndex + 1).trim();
                 }
             }
             
             // Check if this entry contains links
-            if (entry.includes('link:')) {
-                const linkStart = entry.indexOf('link:');
-                const linkPart = entry.substring(linkStart + 5).trim();
+            const linkIndex = entry.indexOf('link:');
+            if (linkIndex !== -1) {
+                // Task title is everything before 'link:'
+                taskTitle = entry.substring(0, linkIndex).trim();
                 
-                // Split links by pipe
-                links = linkPart.split('|').map(link => link.trim()).filter(link => link.length > 0);
-                
-                // Extract task title (everything before 'link:')
-                taskTitle = entry.substring(0, linkStart).trim();
+                // Links are everything after 'link:' separated by |
+                const linkPart = entry.substring(linkIndex + 5).trim();
+                if (linkPart) {
+                    links = linkPart.split('|').map(link => link.trim()).filter(link => link.length > 0);
+                }
             } else {
                 // No links, entire entry is task title
                 taskTitle = entry.trim();
