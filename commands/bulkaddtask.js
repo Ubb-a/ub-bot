@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'bulkaddtask',
     description: 'Add multiple tasks to a roadmap at once',
-    usage: 'bulkaddtask <roadmap_name> | <task1> | <task2> | <task3>',
+    usage: 'bulkaddtask <roadmap_name> , <task1> , <task2> , <task3>',
     
     async execute(message, args) {
         try {
@@ -31,13 +31,13 @@ module.exports = {
 
             // Parse input using | as separator
             const fullInput = args.join(' ');
-            const parts = fullInput.split('|').map(part => part.trim());
+            const parts = fullInput.split(',').map(part => part.trim());
 
             if (parts.length < 2) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Wrong Format')
-                    .setDescription('Use | to separate roadmap name and tasks\n**Usage:** `bulkaddtask roadmap_name | task1 | task2 | task3`')
+                    .setDescription('Use , to separate roadmap name and tasks\n**Usage:** `bulkaddtask roadmap_name , task1 , task2 , task3`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
