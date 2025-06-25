@@ -1,10 +1,11 @@
 const express = require("express");
 const app = express();
+const port = 3000;
 
 app.get("/", (req, res) => {
-  res.send("✅ Bot is alive!");
+  res.send("Bot is alive");
 });
 
-app.listen(3000, () => {
-  console.log("✅ Keep-alive server running on port 3000");
+app.listen(port, () => {
+  console.log(`Uptime server running at http://localhost:${port}`);
 });

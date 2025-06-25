@@ -97,6 +97,11 @@ module.exports = {
                     name: '🧹 emptyroadmap <roadmap_name>',
                     value: 'Empty all tasks from roadmap (admin only)\n**Example:** `emptyroadmap backend`',
                     inline: false
+                },
+                {
+                    name: '📤 autopost <channel_id> <msg1> | <msg2> | <msg3>',
+                    value: 'Setup automatic posting every minute (admin only)\n**Example:** `autopost 123456 Hello! | Good morning! | How are you?`\n**Stop:** `autopost stop`',
+                    inline: false
                 }
             )
             .addFields({

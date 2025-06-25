@@ -197,6 +197,12 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Added automatic text chunking for large task lists
     - Splits long week displays into multiple embed fields
     - Maintains readability while respecting 1024 character Discord limit
+  - **NEW**: Added automatic message posting system (June 25, 2025)
+    - autopost command for setting up recurring messages every minute
+    - Support for multiple different messages that rotate automatically
+    - Channel-specific posting with admin-only configuration
+    - Built-in scheduler that persists across bot restarts
+    - Messages separated by pipe (|) character for easy setup
 
 ## Changelog
 
