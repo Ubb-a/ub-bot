@@ -48,6 +48,16 @@ client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;
     
+    // Check for "زعزوع" mention and respond
+    if (message.content.toLowerCase().includes('زعزوع')) {
+        try {
+            await message.reply('سيبوه في حاله الراجل غلبان');
+        } catch (error) {
+            console.error('Error replying to زعزوع mention:', error);
+        }
+        return;
+    }
+    
     // Check if message starts with ! or is a direct command
     const hasPrefix = message.content.startsWith('!');
     const isDirectCommand = client.commands.has(message.content.split(' ')[0].toLowerCase());

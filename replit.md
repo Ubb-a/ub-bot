@@ -129,6 +129,10 @@ This is a Discord bot application designed to manage role-based roadmaps within 
   - Configured Express web server for monitoring and API endpoints
   - Successfully connected Discord bot with proper intents
   - Bot is online and serving Discord servers
+  - **NEW**: Added Arabic response feature for "زعزوع" mentions
+    - Bot automatically detects "زعزوع" in any message (case-insensitive)
+    - Responds with "سيبوه في حاله الراجل غلبان" when detected
+    - Works independently of command system
 
 ## Changelog
 
