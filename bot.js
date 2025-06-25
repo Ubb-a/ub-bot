@@ -321,7 +321,6 @@ client.on("error", console.error);
 client.on("warn", console.warn);
 
 // Start the keep-alive server
-require("./keep_alive");
 
 // Start the bot
 if (process.env.DISCORD_TOKEN) {
