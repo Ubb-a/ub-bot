@@ -107,7 +107,7 @@ module.exports = {
 
                 } else {
                     const cancelEmbed = new EmbedBuilder()
-                        .setColor(COLORS.GRAY)
+                        .setColor(COLORS.DARK)
                         .setTitle('❌ Operation Cancelled')
                         .setDescription('Roadmap empty operation has been cancelled.')
                         .setTimestamp();
@@ -118,7 +118,7 @@ module.exports = {
 
             } catch (error) {
                 const timeoutEmbed = new EmbedBuilder()
-                    .setColor(COLORS.GRAY)
+                    .setColor(COLORS.DARK)
                     .setTitle('⏰ Confirmation Timeout')
                     .setDescription('Operation cancelled due to timeout (30 seconds).')
                     .setTimestamp();
