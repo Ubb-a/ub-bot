@@ -80,16 +80,23 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Create new task
+            // Create new task with unique emoji
+            const taskEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', 
+                               '🅰️', '🅱️', '🅾️', '🆎', '🅿️', '🆔', '🆕', '🆗', '🆘', '🆙'];
+            
             const newTaskId = roadmap.tasks.length > 0 ? Math.max(...roadmap.tasks.map(t => t.id)) + 1 : 1;
+            const taskEmoji = taskEmojis[Math.min(newTaskId - 1, taskEmojis.length - 1)];
+            
             const newTask = {
                 id: newTaskId,
                 title: taskTitle,
                 description: taskDescription,
+                emoji: taskEmoji,
                 status: 'pending',
                 createdAt: new Date().toISOString(),
                 createdBy: message.author.id,
-                completedBy: [] // Array to track who completed it
+                completedBy: [], // Array to track who completed it
+                hiddenBy: [] // Array to track who hid it
             };
 
             // Add task to roadmap
@@ -100,29 +107,29 @@ module.exports = {
             const taskEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
                 .setTitle('✅ تم إضافة المهمة بنجاح!')
-                .setDescription(`**خريطة الطريق:** ${roadmap.name}\n**المهمة:** ${taskTitle}\n**الوصف:** ${taskDescription}`)
+                .setDescription(`**خريطة الطريق:** ${roadmap.name}\n**المهمة:** ${taskEmoji} ${taskTitle}\n**الوصف:** ${taskDescription}`)
                 .addFields([
                     {
                         name: '📊 تفاصيل المهمة',
-                        value: `**الرقم:** ${newTaskId}\n**الحالة:** معلقة\n**تم الإنشاء بواسطة:** ${message.author}`,
+                        value: `**الرقم:** ${newTaskId}\n**الإيموجي:** ${taskEmoji}\n**الحالة:** معلقة\n**تم الإنشاء بواسطة:** ${message.author}`,
                         inline: false
                     },
                     {
                         name: '💡 كيفية التفاعل',
-                        value: '✅ - اضغط لتمييز المهمة كمكتملة\n❌ - اضغط لإخفاء المهمة من قائمتك',
+                        value: `${taskEmoji} - اضغط لتمييز المهمة كمكتملة\n❌ - اضغط لإخفاء المهمة من قائمتك`,
                         inline: false
                     }
                 ])
                 .setTimestamp()
                 .setFooter({
-                    text: `معرف المهمة: ${newTaskId}`,
+                    text: `معرف المهمة: ${newTaskId} | إيموجي: ${taskEmoji}`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 
             const replyMessage = await message.reply({ embeds: [taskEmbed] });
             
-            // Add reaction buttons
-            await replyMessage.react('✅');
+            // Add reaction buttons - task emoji for completion, ❌ for hiding
+            await replyMessage.react(taskEmoji);
             await replyMessage.react('❌');
 
             // Store message ID for reaction handling

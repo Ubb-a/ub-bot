@@ -81,8 +81,26 @@ client.on('messageReactionAdd', async (reaction, user) => {
             const userId = user.id;
             let updated = false;
             
-            if (reaction.emoji.name === '✅') {
-                // Mark tasks as completed for this user
+            // Handle task-specific emoji reactions (completion)
+            const taskWithEmoji = roadmap.tasks.find(task => task.emoji === reaction.emoji.name);
+            if (taskWithEmoji) {
+                // Mark specific task as completed for this user
+                if (!taskWithEmoji.completedBy) taskWithEmoji.completedBy = [];
+                if (!taskWithEmoji.completedBy.includes(userId)) {
+                    taskWithEmoji.completedBy.push(userId);
+                    updated = true;
+                    
+                    // Send completion message for specific task
+                    const completionEmbed = new EmbedBuilder()
+                        .setColor(COLORS.GREEN)
+                        .setTitle('🎉 تهانينا!')
+                        .setDescription(`لقد قمت بتمييز المهمة "${taskWithEmoji.emoji} ${taskWithEmoji.title}" كمكتملة!`)
+                        .setTimestamp();
+                    
+                    message.channel.send({ embeds: [completionEmbed] }).catch(console.error);
+                }
+            } else if (reaction.emoji.name === '✅') {
+                // Fallback: Mark all tasks as completed for this user (legacy support)
                 roadmap.tasks.forEach(task => {
                     if (!task.completedBy) task.completedBy = [];
                     if (!task.completedBy.includes(userId)) {
@@ -96,7 +114,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                     const completionEmbed = new EmbedBuilder()
                         .setColor(COLORS.GREEN)
                         .setTitle('🎉 تهانينا!')
-                        .setDescription(`لقد قمت بتمييز مهام خريطة "${roadmapName}" كمكتملة!`)
+                        .setDescription(`لقد قمت بتمييز جميع مهام خريطة "${roadmapName}" كمكتملة!`)
                         .setTimestamp();
                     
                     message.channel.send({ embeds: [completionEmbed] }).catch(console.error);
@@ -159,6 +177,7 @@ client.on('messageCreate', async (message) => {
                 { name: '!create', value: 'إنشاء خريطة طريق جديدة', inline: true },
                 { name: '!addtask', value: 'إضافة مهمة جديدة', inline: true },
                 { name: '!tasks', value: 'عرض المهام مع التفاعل', inline: true },
+                { name: '!taskstats', value: 'إحصائيات المهام (إداري)', inline: true },
                 { name: '!myroadmaps', value: 'عرض خرائطك المتاحة', inline: true },
                 { name: '!showroadmap', value: 'عرض تفاصيل خريطة معينة', inline: true }
             )

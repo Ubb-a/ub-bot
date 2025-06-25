@@ -80,10 +80,11 @@ module.exports = {
                 const task = visibleTasks[i];
                 const isCompleted = task.completedBy && task.completedBy.includes(userId);
                 const statusEmoji = isCompleted ? '✅' : '⏳';
+                const taskEmoji = task.emoji || '📝';
                 
                 embed.addFields({
-                    name: `${statusEmoji} ${task.title}`,
-                    value: `**الوصف:** ${task.description}\n**الرقم:** ${task.id}\n**تاريخ الإنشاء:** ${new Date(task.createdAt).toLocaleDateString('ar-EG')}\n\n✅ - مكتملة | ❌ - إخفاء`,
+                    name: `${statusEmoji} ${taskEmoji} ${task.title}`,
+                    value: `**الوصف:** ${task.description}\n**الرقم:** ${task.id}\n**تاريخ الإنشاء:** ${new Date(task.createdAt).toLocaleDateString('ar-EG')}\n\n${taskEmoji} - مكتملة | ❌ - إخفاء`,
                     inline: false
                 });
             }
@@ -98,20 +99,17 @@ module.exports = {
 
             const replyMessage = await message.reply({ embeds: [embed] });
             
-            // Add reactions for each visible task (up to 10)
-            const taskIds = visibleTasks.slice(0, 10).map(t => t.id);
+            // Add reactions for each visible task (up to 10) using their unique emojis
+            const tasksToShow = visibleTasks.slice(0, 10);
             
-            // Store task interaction data
-            const interactionData = {
-                roadmapKey,
-                taskIds,
-                userId: message.author.id,
-                messageId: replyMessage.id
-            };
-
-            // Add reactions
-            await replyMessage.react('✅');
-            await replyMessage.react('❌');
+            // Add each task's unique emoji as reaction
+            for (const task of tasksToShow) {
+                const taskEmoji = task.emoji || '📝';
+                await replyMessage.react(taskEmoji).catch(console.error);
+            }
+            
+            // Add hide reaction
+            await replyMessage.react('❌').catch(console.error);
 
             // Store interaction data in message (for reaction handler)
             // We'll handle this in the bot.js reaction handler
