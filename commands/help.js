@@ -44,53 +44,53 @@ module.exports = {
                     inline: false
                 },
                 {
-                    name: '📅 schedule <رود_ماب> | <مهمة> | <وصف> | <يوم>',
-                    value: 'جدولة مهام أسبوعية (للأدمن بس)\n**مثال:** `schedule web-dev | مراجعة | راجع الأسبوع | monday`',
+                    name: '📅 schedule <roadmap> | <task> | <description> | <day>',
+                    value: 'Schedule weekly tasks (admin only)\n**Example:** `schedule web-dev | Review | Weekly review | monday`',
                     inline: false
                 },
                 {
-                    name: '➕ addtask <رود_ماب> <أسبوع> <المهمة> [link: <رابط>]',
-                    value: 'ضيف مهمة جديدة مع رابط اختياري (بالمنشن أو للأدمن)\n**مثال:** `addtask web-dev 2 تعلم HTML link: https://example.com`',
+                    name: '➕ addtask <roadmap> <week> <task> [link: <url>]',
+                    value: 'Add new task with optional link (mention or admin)\n**Example:** `addtask web-dev 2 Learn HTML link: https://example.com`',
                     inline: false
                 },
                 {
-                    name: '🗑️ deletetask <رود_ماب> <رقم_المهمة>',
-                    value: 'امسح مهمة معينة وأعد ترتيب الأرقام (بالمنشن أو للأدمن)\n**مثال:** `deletetask web-dev 3`',
+                    name: '🗑️ deletetask <roadmap> <task_number>',
+                    value: 'Delete specific task and reorder IDs (mention or admin)\n**Example:** `deletetask web-dev 3`',
                     inline: false
                 },
                 {
-                    name: '📦 bulkaddtask <رود_ماب> <أسبوع> , <مهمة1> , <مهمة2>',
-                    value: 'زود كام مهمة مع بعض في أسبوع معين\n**مثال:** `bulkaddtask web-dev 1 , HTML , CSS , JavaScript`',
+                    name: '📦 bulkaddtask <roadmap> <week> , <task1> , <task2>',
+                    value: 'Add multiple tasks to specific week\n**Example:** `bulkaddtask web-dev 1 , HTML , CSS , JavaScript`',
                     inline: false
                 },
                 {
-                    name: '📋 tasks [اسم_الرود_ماب]',
-                    value: 'شوف كل المهام مرقمة من 1 لـ N. لو عندك رود ماب واحدة، مش محتاج تكتب الاسم\n**مثال:** `tasks` أو `tasks backend`',
+                    name: '📋 tasks [roadmap_name]',
+                    value: 'View all tasks numbered 1 to N. If you have one roadmap, no need to specify name\n**Example:** `tasks` or `tasks backend`',
                     inline: false
                 },
                 {
-                    name: '✅ done <رقم_المهمة> [اسم_الرود_ماب]',
-                    value: 'خلص مهمة برقمها\n**مثال:** `done 2` أو `done 3 backend`',
+                    name: '✅ done <task_number> [roadmap_name]',
+                    value: 'Complete task by its number\n**Example:** `done 2` or `done 3 backend`',
                     inline: false
                 },
                 {
-                    name: '📊 taskstats <اسم_الرود_ماب>',
-                    value: 'شوف إحصائيات تفاعل الناس مع المهام (للأدمن بس)\n**بيوضح:** مين خلص إيه من المهام',
+                    name: '📊 taskstats <roadmap_name>',
+                    value: 'View task interaction statistics (admin only)\n**Shows:** Who completed which tasks',
                     inline: false
                 },
                 {
-                    name: '🧹 clear [عدد]',
-                    value: 'امسح رسايل الشات (للأدمن بس)\n**مثال:** `clear 10` أو `clear` (بيمسح آخر 5)',
+                    name: '🧹 clear [number]',
+                    value: 'Clear chat messages (admin only)\n**Example:** `clear 10` or `clear` (clears last 5)',
                     inline: false
                 },
                 {
-                    name: '📬 dm <@الرتبة> <الرسالة>',
-                    value: 'ابعت رسالة خاصة لكل الناس اللي عندها رتبة معينة (للأدمن بس)\n**مثال:** `dm @Developer شوفوا المهام الجديدة!`',
+                    name: '📬 dm <@role> <message>',
+                    value: 'Send private message to all users with specific role (admin only)\n**Example:** `dm @Developer Check new tasks!`',
                     inline: false
                 },
                 {
-                    name: '🗑️ deleteroadmap <اسم_الرود_ماب>',
-                    value: 'امسح رود ماب خالص (للأدمن بس)\n**مثال:** `deleteroadmap backend`',
+                    name: '🗑️ deleteroadmap <roadmap_name>',
+                    value: 'Delete roadmap completely (admin only)\n**Example:** `deleteroadmap backend`',
                     inline: false
                 }
             )

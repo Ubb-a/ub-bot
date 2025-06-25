@@ -165,6 +165,14 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Added deletetask command with automatic ID reordering
     - Enhanced showroadmap to be role-based with smart selection
     - All tasks now display links when provided
+    - Implemented hierarchical task display format (Week Number -> Topic Name -> Numbered tasks with multi-line links)
+    - Added support for multiple links per task
+  - **FINAL**: Complete English conversion (June 25, 2025)
+    - Converted all Arabic text to English throughout the entire system
+    - Changed bot prefix from "يا سمكري" to "ya samkari"
+    - Updated all command descriptions, error messages, and responses to English
+    - Changed "za3zo3" mention detection from Arabic to English transliteration
+    - All help commands and bot responses now in English
 
 ## Changelog
 
@@ -178,8 +186,9 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
-Primary language: Arabic
-Bot usage: Discord roadmap management with role-based access
-System design: Number-based task completion (no emojis)
-Smart role detection: Auto-show tasks for user's role without specifying roadmap name
+Primary language: English
+Bot usage: Discord roadmap management with mention-based permissions
+System design: Hierarchical task display with week numbers and multiple link support
+Task management: Number-based completion system with automatic ID reordering
+Permission system: Mention-based instead of role-based restrictions
 ```

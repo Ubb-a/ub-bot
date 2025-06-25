@@ -16,8 +16,8 @@ module.exports = {
             if (!hasManageRoles && !mentionedUsers.has(message.author.id)) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ ممنوع الوصول')
-                    .setDescription('محتاج صلاحية "إدارة الأدوار" أو منشن عشان تمسح مهام.')
+                    .setTitle('❌ Access Denied')
+                    .setDescription('You need "Manage Roles" permission or mention to delete tasks.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -26,8 +26,8 @@ module.exports = {
             if (args.length < 2) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ معلومات ناقصة')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`deletetask web-dev 3\``)
+                    .setTitle('❌ Missing Information')
+                    .setDescription(`**Usage:** ${this.usage}\n**Example:** \`deletetask web-dev 3\``)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -38,8 +38,8 @@ module.exports = {
             if (isNaN(taskId) || taskId < 1) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ رقم مهمة غير صحيح')
-                    .setDescription('رقم المهمة لازم يكون رقم أكبر من 0.')
+                    .setTitle('❌ Invalid Task Number')
+                    .setDescription('Task number must be a number greater than 0.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -51,8 +51,8 @@ module.exports = {
             if (!roadmap) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ الرود ماب مش موجودة')
-                    .setDescription(`مفيش رود ماب بالاسم "${roadmapName}" في السيرفر ده.`)
+                    .setTitle('❌ Roadmap Not Found')
+                    .setDescription(`No roadmap named "${roadmapName}" exists in this server.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -63,8 +63,8 @@ module.exports = {
             if (taskIndex === -1) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ المهمة مش موجودة')
-                    .setDescription(`مفيش مهمة برقم ${taskId} في الرود ماب "${roadmapName}".`)
+                    .setTitle('❌ Task Not Found')
+                    .setDescription(`No task with ID ${taskId} exists in roadmap "${roadmapName}".`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -85,11 +85,11 @@ module.exports = {
             // Create success embed
             const successEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
-                .setTitle('✅ تم مسح المهمة بنجاح!')
-                .setDescription(`**المهمة المحذوفة:** ${deletedTask.title}\n**الرود ماب:** ${roadmap.name}\n**تم إعادة ترتيب أرقام المهام**`)
+                .setTitle('✅ Task Deleted Successfully!')
+                .setDescription(`**Deleted Task:** ${deletedTask.title}\n**Roadmap:** ${roadmap.name}\n**Task IDs have been reordered**`)
                 .setTimestamp()
                 .setFooter({
-                    text: `إجمالي المهام: ${roadmap.tasks.length}`,
+                    text: `Total tasks: ${roadmap.tasks.length}`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 
