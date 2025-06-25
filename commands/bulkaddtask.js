@@ -194,120 +194,61 @@ module.exports = {
 
     parseTasksInput(input) {
         const tasks = [];
+        let currentTopic = null;
         
-        // Split by "T:" to separate different topics
-        const topicSections = input.split(/(?=\s+T:)/);
+        // Split input by spaces but keep track of links
+        const tokens = input.split(' ');
+        let i = 0;
         
-        for (const section of topicSections) {
-            if (!section.trim()) continue;
+        while (i < tokens.length) {
+            const token = tokens[i];
             
-            // Extract topic from T:topicname
-            const topicMatch = section.match(/T:(\w+)/);
-            if (!topicMatch) continue;
-            
-            const topic = topicMatch[1];
-            const remainingContent = section.replace(/T:\w+\s*/, '');
-            
-            // Parse tasks in this topic section
-            const sectionTasks = this.parseTasksInTopicSection(remainingContent, topic);
-            tasks.push(...sectionTasks);
-        }
-        
-        return tasks;
-    },
-    
-    parseTasksInTopicSection(content, topic) {
-        const tasks = [];
-        const parts = [];
-        let currentPart = '';
-        let insideLink = false;
-        let linkStarted = false;
-        
-        // Split content into words but preserve link structure
-        const words = content.split(/\s+/);
-        
-        for (let i = 0; i < words.length; i++) {
-            const word = words[i];
-            
-            if (word.startsWith('link:')) {
-                // Start of link - finish current task and start link collection
-                insideLink = true;
-                linkStarted = true;
-                currentPart += ' ' + word;
-                
-                // Continue collecting until we hit a word that's not part of URLs/commas
+            // Check if this is a topic definition
+            if (token.startsWith('T:')) {
+                currentTopic = token.substring(2);
                 i++;
-                while (i < words.length) {
-                    const nextWord = words[i];
-                    // If it's a URL, comma, or continues the link pattern, include it
-                    if (nextWord.includes('http') || nextWord.startsWith(',') || 
-                        nextWord.includes('.com') || nextWord.includes('.org') || 
-                        nextWord.includes('.net') || nextWord.includes('.edu') ||
-                        nextWord === ',' || nextWord.endsWith(',')) {
-                        currentPart += ' ' + nextWord;
-                        i++;
-                    } else {
-                        // This word is not part of the link, back up and break
-                        i--;
-                        break;
-                    }
+                continue;
+            }
+            
+            // Check if this is a link definition
+            if (token.startsWith('link:')) {
+                // This shouldn't happen at the start, skip
+                i++;
+                continue;
+            }
+            
+            // This should be a task title
+            if (currentTopic) {
+                let taskTitle = '';
+                let links = [];
+                
+                // Collect task title until we hit a link or next topic
+                while (i < tokens.length && !tokens[i].startsWith('T:') && !tokens[i].startsWith('link:')) {
+                    if (taskTitle) taskTitle += ' ';
+                    taskTitle += tokens[i];
+                    i++;
                 }
                 
-                // End the current task with its link
-                if (currentPart.trim()) {
-                    parts.push(currentPart.trim());
-                    currentPart = '';
+                // Check if next token is a link
+                if (i < tokens.length && tokens[i].startsWith('link:')) {
+                    const linkData = tokens[i].substring(5); // Remove 'link:'
+                    links = linkData.split(',').map(link => link.trim()).filter(link => link.length > 0);
+                    i++;
                 }
-                insideLink = false;
-            } else if (!insideLink) {
-                // Regular task content
-                if (currentPart) currentPart += ' ';
-                currentPart += word;
-            }
-        }
-        
-        // Add the last part if it exists
-        if (currentPart.trim()) {
-            parts.push(currentPart.trim());
-        }
-        
-        // Convert parts to task objects
-        for (const part of parts) {
-            const taskData = this.extractTaskAndLinks(part);
-            if (taskData.title) {
-                tasks.push({
-                    title: taskData.title,
-                    topic: topic,
-                    links: taskData.links
-                });
+                
+                if (taskTitle.trim()) {
+                    tasks.push({
+                        title: taskTitle.trim(),
+                        topic: currentTopic,
+                        links: links
+                    });
+                }
+            } else {
+                // No topic defined yet, skip this token
+                i++;
             }
         }
         
         return tasks;
-    },
-    
-    extractTaskAndLinks(taskString) {
-        const linkMatch = taskString.match(/^(.+?)\s+link:(.+)$/);
-        
-        if (linkMatch) {
-            const title = linkMatch[1].trim();
-            const linksString = linkMatch[2].trim();
-            
-            // Clean up the links string and split by comma
-            const cleanLinksString = linksString.replace(/\s*,\s*/g, ',');
-            const links = cleanLinksString.split(',')
-                .map(link => link.trim())
-                .filter(link => link.length > 0);
-            
-            return {
-                title: title,
-                links: links
-            };
-        } else {
-            return {
-                title: taskString.trim(),
-                links: []
-            };
-        }
     }
 };
