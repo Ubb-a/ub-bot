@@ -183,11 +183,11 @@ This is a Discord bot application designed to manage role-based roadmaps within 
   - **REWRITTEN**: Complete bulkaddtask command overhaul (June 25, 2025)
     - Completely rewrote parsing logic from scratch for better reliability
     - Changed main separator to pipe (`|`) for tasks and entries
-    - Links within tasks still use pipe (`|`) separation after "link:" keyword
-    - New format: `bulkaddtask roadmap week T:topic task1 link:url1|url2 | task2 | T:newtopic task3`
+    - Links within tasks use comma (`,`) separation after "link:" keyword
+    - New format: `bulkaddtask roadmap week T:topic task1 link:url1,url2 | task2 | T:newtopic task3`
     - Simplified parsing: split by pipe first, then process each entry individually
     - Topics can be standalone entries or combined with tasks
-    - Cleaner separation between task titles and links
+    - Fixed conflict between task separator and link separator
 
 ## Changelog
 

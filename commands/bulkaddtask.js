@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'bulkaddtask',
     description: 'Add multiple tasks to a roadmap at once with topics and optional links',
-    usage: 'bulkaddtask <roadmap_name> <week_number> T:<topic> task1 [link:url1|url2] | task2 | T:<new_topic> task3',
+    usage: 'bulkaddtask <roadmap_name> <week_number> T:<topic> task1 [link:url1,url2] | task2 | T:<new_topic> task3',
     
     async execute(message, args) {
         try {
@@ -24,7 +24,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Missing Arguments')
-                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number T:<topic> task1 link:url1|url2 | task2 | T:<new_topic> task3`\n**Example:** `bulkaddtask backend 2 T:Node.js Learn basics link:url1|url2 | Setup server | T:Database Create models`')
+                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number T:<topic> task1 link:url1,url2 | task2 | T:<new_topic> task3`\n**Example:** `bulkaddtask backend 2 T:Node.js Learn basics link:url1,url2 | Setup server | T:Database Create models`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -83,7 +83,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ No Valid Tasks Found')
-                    .setDescription('Please provide tasks in the correct format: T:<topic> task1 link:url1|url2 | task2')
+                    .setDescription('Please provide tasks in the correct format: T:<topic> task1 link:url1,url2 | task2')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -226,10 +226,10 @@ module.exports = {
                 // Task title is everything before 'link:'
                 taskTitle = entry.substring(0, linkIndex).trim();
                 
-                // Links are everything after 'link:' separated by |
+                // Links are everything after 'link:' separated by comma
                 const linkPart = entry.substring(linkIndex + 5).trim();
                 if (linkPart) {
-                    links = linkPart.split('|').map(link => link.trim()).filter(link => link.length > 0);
+                    links = linkPart.split(',').map(link => link.trim()).filter(link => link.length > 0);
                 }
             } else {
                 // No links, entire entry is task title
