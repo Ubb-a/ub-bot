@@ -4,8 +4,8 @@ const { getRoadmap, saveRoadmap, getRoadmaps } = require('../utils/dataManager')
 
 module.exports = {
     name: 'done',
-    description: 'Mark a task as completed by its number',
-    usage: 'done <task_number> [roadmap_name]',
+    description: 'Mark a task as completed by its ID',
+    usage: 'done <task_id> [roadmap_name]',
     
     async execute(message, args) {
         try {
@@ -18,12 +18,12 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            const taskNumber = parseInt(args[0]);
-            if (isNaN(taskNumber) || taskNumber < 1) {
+            const taskId = parseInt(args[0]);
+            if (isNaN(taskId) || taskId < 1) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ Invalid Number')
-                    .setDescription('Please enter a valid task number (1, 2, 3...)')
+                    .setTitle('❌ Invalid ID')
+                    .setDescription('Please enter a valid task ID (1, 2, 3...)')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -120,47 +120,44 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Get the task by its position in visible tasks (1-indexed)
-            const taskToComplete = visibleTasks[taskNumber - 1];
-
-            if (!taskToComplete.completedBy) taskToComplete.completedBy = [];
-
-            if (taskToComplete.completedBy.includes(userId)) {
+            // Find the task by ID
+            const task = targetRoadmap.tasks.find(t => t.id === taskId);
+            
+            if (!task) {
                 const errorEmbed = new EmbedBuilder()
-                    .setColor(COLORS.YELLOW)
-                    .setTitle('⚠️ Task Already Completed')
-                    .setDescription(`You have already marked the task "${taskToComplete.title}" as completed.`)
+                    .setColor(COLORS.RED)
+                    .setTitle('❌ Task Not Found')
+                    .setDescription(`No task with ID ${taskId} found in the roadmap.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Mark task as completed
-            taskToComplete.completedBy.push(userId);
-            saveRoadmap(roadmapKey, targetRoadmap);
+            if (!task.completedBy) task.completedBy = [];
+            const isCompleted = task.completedBy.includes(userId);
 
-            const completionEmbed = new EmbedBuilder()
+            if (!isCompleted) {
+                task.completedBy.push(userId);
+                saveRoadmap(roadmapKey, targetRoadmap);
+            }
+
+            const successEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
-                .setTitle('🎉 Congratulations!')
-                .setDescription(`You have marked the task "${taskToComplete.title}" as completed!`)
+                .setTitle('✅ Task Completed!')
+                .setDescription(`**Task:** ${task.title}\n**Topic:** ${task.topic || 'General'}\n**Roadmap:** ${targetRoadmap.name}`)
                 .addFields([
                     {
-                        name: '📊 Task Details',
-                        value: `**Roadmap:** ${targetRoadmap.name}\n**Task:** ${taskToComplete.title}`,
-                        inline: false
-                    },
-                    {
-                        name: '📈 Progress',
-                        value: `Total people who completed this task: ${taskToComplete.completedBy.length}`,
+                        name: '🎯 Details',
+                        value: `**Task ID:** ${taskId}\n**Status:** ${isCompleted ? 'Already completed' : 'Newly completed'}\n**Week:** ${task.weekNumber || 'Not specified'}`,
                         inline: false
                     }
                 ])
                 .setTimestamp()
                 .setFooter({
-                    text: `${targetRoadmap.name} | Task Completion`,
-                    iconURL: message.guild.iconURL({ dynamic: true })
+                    text: `${isCompleted ? 'Already completed' : 'Completed'} by ${message.author.tag}`,
+                    iconURL: message.author.displayAvatarURL({ dynamic: true })
                 });
 
-            await message.reply({ embeds: [completionEmbed] });
+            await message.reply({ embeds: [successEmbed] });
 
         } catch (err) {
             console.error('Error in done command:', err);

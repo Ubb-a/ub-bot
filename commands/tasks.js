@@ -94,6 +94,21 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
+            // Group tasks by week and topic
+            const tasksByWeek = {};
+            visibleTasks.forEach(task => {
+                const week = task.weekNumber || 1;
+                const topic = task.topic || 'General';
+                
+                if (!tasksByWeek[week]) {
+                    tasksByWeek[week] = {};
+                }
+                if (!tasksByWeek[week][topic]) {
+                    tasksByWeek[week][topic] = [];
+                }
+                tasksByWeek[week][topic].push(task);
+            });
+
             // Create tasks embed
             const embed = new EmbedBuilder()
                 .setColor(COLORS.BLURPLE)
@@ -105,24 +120,52 @@ module.exports = {
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 
-            // Add each task as a field with numbers
-            for (let i = 0; i < Math.min(visibleTasks.length, 15); i++) {
-                const task = visibleTasks[i];
-                const isCompleted = task.completedBy && task.completedBy.includes(userId);
-                const statusEmoji = isCompleted ? '✅' : '⏳';
-                const taskNumber = i + 1;
+            // Display tasks organized by week and topic
+            const sortedWeeks = Object.keys(tasksByWeek).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            for (const weekNum of sortedWeeks.slice(0, 10)) { // Show max 10 weeks
+                const weekTopics = tasksByWeek[weekNum];
+                let weekText = '';
+                let totalWeekTasks = 0;
+                
+                // Sort topics alphabetically
+                const sortedTopics = Object.keys(weekTopics).sort();
+                
+                for (const topicName of sortedTopics) {
+                    const topicTasks = weekTopics[topicName];
+                    totalWeekTasks += topicTasks.length;
+                    
+                    weekText += `**📚 ${topicName}:**\n`;
+                    
+                    topicTasks.forEach((task) => {
+                        const isCompleted = task.completedBy && task.completedBy.includes(userId);
+                        const statusEmoji = isCompleted ? '✅' : '⏳';
+                        
+                        weekText += `  ${statusEmoji} **${task.id}.** ${task.title}\n`;
+                        
+                        // Add links if they exist
+                        if (task.links && task.links.length > 0) {
+                            task.links.forEach(link => {
+                                weekText += `    🔗 ${link}\n`;
+                            });
+                        } else if (task.link) {
+                            weekText += `    🔗 ${task.link}\n`;
+                        }
+                    });
+                    weekText += '\n';
+                }
                 
                 embed.addFields({
-                    name: `${statusEmoji} ${taskNumber}. ${task.title}`,
-                    value: `**Task Number:** ${taskNumber}`,
+                    name: `📅 Week ${weekNum} (${totalWeekTasks} tasks)`,
+                    value: weekText || 'No tasks in this week.',
                     inline: false
                 });
             }
 
-            if (visibleTasks.length > 15) {
+            if (sortedWeeks.length > 10) {
                 embed.addFields({
                     name: '📌 Note',
-                    value: `Showing first 15 tasks only. Total tasks: ${visibleTasks.length}`,
+                    value: `Showing first 10 weeks only. Total weeks: ${sortedWeeks.length}`,
                     inline: false
                 });
             }
@@ -130,7 +173,7 @@ module.exports = {
             // Add instructions for completing tasks
             embed.addFields({
                 name: '💡 How to Use',
-                value: `To mark a task as completed, type: \`done task_number\`\nExample: \`done 2\` to complete task number 2`,
+                value: `To mark a task as completed, type: \`done task_id\`\nExample: \`done 2\` to complete task ID 2`,
                 inline: false
             });
 

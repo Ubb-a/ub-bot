@@ -4,8 +4,8 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 
 module.exports = {
     name: 'addtask',
-    description: 'Add a new task to a roadmap',
-    usage: 'addtask <roadmap_name> <week_number> <task_title> [link: <url>]',
+    description: 'Add a new task to a roadmap with topic organization',
+    usage: 'addtask <roadmap_name> <week_number> <topic_name> <task_title> [link: url1,url2]',
     
     async execute(message, args) {
         try {
@@ -23,41 +23,33 @@ module.exports = {
             }
 
             // Check if arguments are provided
-            if (args.length === 0) {
+            if (args.length < 4) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ Missing Information')
-                    .setDescription(`**Usage:** ${this.usage}\n**Example:** \`addtask web-dev 2 Learn HTML\` or \`addtask web-dev 2 Learn HTML link: https://example.com\`\n\n**Note:** Week number from 1 to 52.`)
+                    .setTitle('❌ Missing Arguments')
+                    .setDescription(`**Usage:** ${this.usage}\n**Example:** \`addtask web-dev 2 JavaScript Learn Node.js link: https://nodejs.org,https://github.com\`\n\n**Note:** Week number from 1 to 52.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            const fullArgs = args.join(' ');
-            
-            if (args.length < 3) {
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(COLORS.RED)
-                    .setTitle('❌ Wrong Usage')
-                    .setDescription(`**Usage:** ${this.usage}\n**Example:** \`addtask web-dev 2 Learn HTML\``)
-                    .setTimestamp();
-                return message.reply({ embeds: [errorEmbed] });
-            }
-
-            // Parse roadmap name, week number, and task title
             const roadmapName = args[0];
             const weekNumber = parseInt(args[1]);
+            const topicName = args[2];
             
-            // Check for link in the text (supports multiple links)
-            let taskTitle = args.slice(2).join(' ');
-            let taskLink = null;
+            // Parse task title and links
+            const remainingArgs = args.slice(3);
+            let taskTitle = '';
+            let taskLinks = [];
             
-            if (taskTitle.includes('link:')) {
-                const linkIndex = taskTitle.indexOf('link:');
-                const beforeLink = taskTitle.substring(0, linkIndex).trim();
-                const afterLink = taskTitle.substring(linkIndex + 5).trim();
-                
-                taskTitle = beforeLink;
-                taskLink = afterLink; // Can contain multiple links separated by spaces/commas
+            for (let i = 0; i < remainingArgs.length; i++) {
+                const arg = remainingArgs[i];
+                if (arg.startsWith('link:')) {
+                    const linkString = arg.substring(5);
+                    taskLinks = linkString.split(',').map(link => link.trim()).filter(link => link);
+                    break;
+                } else {
+                    taskTitle += (taskTitle ? ' ' : '') + arg;
+                }
             }
 
             // Validate inputs
@@ -93,78 +85,53 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Skip role check since we're using mentions now
-
-            // Create new task with unique emoji - ensure each task has different emoji
-            const taskEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', 
-                               '📝', '📚', '💻', '🔧', '⚡', '🎯', '🚀', '💡', '🔥', '⭐', 
-                               '🎨', '📊', '🛠️', '🔍', '📱', '🌟', '💰', '🎵', '🏆', '🎮',
-                               '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫', '⚪', '🟤', '🔸'];
+            // Find the highest ID in the same topic to maintain order
+            const topicTasks = roadmap.tasks.filter(task => 
+                task.weekNumber === weekNumber && task.topic === topicName
+            );
             
-            // Find first unused emoji in this roadmap
-            let taskEmoji = '📝';
-            const usedEmojis = roadmap.tasks.map(task => task.emoji);
-            for (const emoji of taskEmojis) {
-                if (!usedEmojis.includes(emoji)) {
-                    taskEmoji = emoji;
-                    break;
-                }
-            }
-            
+            // Create new task object
             const newTaskId = roadmap.tasks.length > 0 ? Math.max(...roadmap.tasks.map(t => t.id)) + 1 : 1;
             
             const newTask = {
                 id: newTaskId,
                 title: taskTitle,
-                description: taskTitle, // Use title as description
-                link: taskLink, // Add link if provided
-                emoji: taskEmoji,
-                status: 'pending',
-                createdBy: message.author.id,
+                topic: topicName,
                 weekNumber: weekNumber,
+                status: 'pending',
                 createdAt: new Date().toISOString(),
-                completedBy: [], // Array to track who completed it
-                hiddenBy: [] // Array to track who hid it
+                createdBy: message.author.id,
+                completedBy: [],
+                hiddenBy: []
             };
+            
+            // Add links if provided
+            if (taskLinks.length > 0) {
+                newTask.links = taskLinks;
+            }
 
             // Add task to roadmap
             roadmap.tasks.push(newTask);
             saveRoadmap(roadmapKey, roadmap);
 
-            // Create task embed
-            let embedDescription = `**Roadmap:** ${roadmap.name}\n**Task:** ${taskTitle}\n**Week:** ${weekNumber}\n**ID:** ${newTaskId}`;
-            
-            if (taskLink) {
-                embedDescription += `\n**Link:** ${taskLink}`;
-            }
-            
-            const taskEmbed = new EmbedBuilder()
+            const successEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
                 .setTitle('✅ Task Added Successfully!')
-                .setDescription(embedDescription)
+                .setDescription(`**Task:** ${taskTitle}\n**Topic:** ${topicName}\n**Week:** ${weekNumber}\n**Roadmap:** ${roadmapName}`)
                 .addFields([
                     {
-                        name: '💡 How to Use',
-                        value: `Use \`tasks ${roadmap.name.toLowerCase()}\` to view tasks\nUse \`done task_number\` to complete task`,
+                        name: '📋 Task Details',
+                        value: `**ID:** ${newTask.id}\n**Status:** Pending${taskLinks.length > 0 ? `\n**Links:** ${taskLinks.length} link(s)` : ''}`,
                         inline: false
                     }
                 ])
                 .setTimestamp()
                 .setFooter({
-                    text: `Total tasks: ${roadmap.tasks.length}`,
-                    iconURL: message.guild.iconURL({ dynamic: true })
+                    text: `Added by ${message.author.tag}`,
+                    iconURL: message.author.displayAvatarURL({ dynamic: true })
                 });
 
-            const replyMessage = await message.reply({ embeds: [taskEmbed] });
-            
-            // Add reaction buttons - task emoji for completion, ❌ for hiding
-            await replyMessage.react(taskEmoji);
-            await replyMessage.react('❌');
-
-            // Store message ID for reaction handling
-            newTask.messageId = replyMessage.id;
-            newTask.channelId = message.channel.id;
-            saveRoadmap(roadmapKey, roadmap);
+            await message.reply({ embeds: [successEmbed] });
 
         } catch (err) {
             console.error('Error in addtask command:', err);

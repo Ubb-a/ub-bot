@@ -106,14 +106,19 @@ module.exports = {
             inline: false
         });
         
-        // Group tasks by week
+        // Group tasks by week and then by topic
         const tasksByWeek = {};
         tasks.forEach(task => {
             const week = task.weekNumber || 1;
+            const topic = task.topic || 'General';
+            
             if (!tasksByWeek[week]) {
-                tasksByWeek[week] = [];
+                tasksByWeek[week] = {};
             }
-            tasksByWeek[week].push(task);
+            if (!tasksByWeek[week][topic]) {
+                tasksByWeek[week][topic] = [];
+            }
+            tasksByWeek[week][topic].push(task);
         });
 
         // Add tasks section organized by weeks
@@ -121,34 +126,48 @@ module.exports = {
             const sortedWeeks = Object.keys(tasksByWeek).sort((a, b) => parseInt(a) - parseInt(b));
             
             for (const weekNum of sortedWeeks.slice(0, 5)) { // Show max 5 weeks to prevent overflow
-                const weekTasks = tasksByWeek[weekNum];
+                const weekTopics = tasksByWeek[weekNum];
                 let weekText = '';
+                let totalWeekTasks = 0;
                 
-                weekTasks.forEach((task, index) => {
-                    let statusEmoji = '';
-                    switch (task.status) {
-                        case 'completed':
-                            statusEmoji = '✅';
-                            break;
-                        case 'in-progress':
-                            statusEmoji = '🔄';
-                            break;
-                        default:
-                            statusEmoji = '⏳';
-                    }
+                // Sort topics alphabetically
+                const sortedTopics = Object.keys(weekTopics).sort();
+                
+                for (const topicName of sortedTopics) {
+                    const topicTasks = weekTopics[topicName];
+                    totalWeekTasks += topicTasks.length;
                     
-                    weekText += `${statusEmoji} **${task.id}.** ${task.title}\n`;
-                    if (task.description && task.description !== task.title) {
-                        weekText += `   ${task.description.substring(0, 60)}${task.description.length > 60 ? '...' : ''}\n`;
-                    }
-                    if (task.link) {
-                        weekText += `   🔗 ${task.link}\n`;
-                    }
+                    weekText += `**📚 ${topicName}:**\n`;
+                    
+                    topicTasks.forEach((task, index) => {
+                        let statusEmoji = '';
+                        switch (task.status) {
+                            case 'completed':
+                                statusEmoji = '✅';
+                                break;
+                            case 'in-progress':
+                                statusEmoji = '🔄';
+                                break;
+                            default:
+                                statusEmoji = '⏳';
+                        }
+                        
+                        weekText += `  ${statusEmoji} **${task.id}.** ${task.title}\n`;
+                        
+                        // Add links if they exist
+                        if (task.links && task.links.length > 0) {
+                            task.links.forEach(link => {
+                                weekText += `    🔗 ${link}\n`;
+                            });
+                        } else if (task.link) {
+                            weekText += `    🔗 ${task.link}\n`;
+                        }
+                    });
                     weekText += '\n';
-                });
+                }
                 
                 embed.addFields({
-                    name: `📅 Week ${weekNum} (${weekTasks.length} tasks)`,
+                    name: `📅 Week ${weekNum} (${totalWeekTasks} tasks)`,
                     value: weekText || 'No tasks in this week.',
                     inline: false
                 });

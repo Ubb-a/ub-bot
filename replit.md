@@ -173,6 +173,13 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Updated all command descriptions, error messages, and responses to English
     - Changed "za3zo3" mention detection from Arabic to English transliteration
     - All help commands and bot responses now in English
+  - **ENHANCED**: Topic-based task organization (June 25, 2025)
+    - Updated addtask command to require topic parameter: addtask <roadmap> <week> <topic> <task> [link: url1,url2]
+    - Added multi-link support using comma separation (link:url1,url2,url3)
+    - Implemented hierarchical display: Week Number → Topic Name → Tasks → Links
+    - Updated showroadmap and tasks commands to display week/topic/task hierarchy
+    - Tasks are now organized by topics within weeks for better structure
+    - Multiple links per task are displayed individually under each task
 
 ## Changelog
 
