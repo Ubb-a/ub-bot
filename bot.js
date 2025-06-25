@@ -38,7 +38,7 @@ client.once('ready', () => {
     
     // Set bot presence
     client.user.setPresence({
-        activities: [{ name: 'خرائط الطريق | !help', type: 0 }],
+        activities: [{ name: 'Roadmaps | !help', type: 0 }],
         status: 'online'
     });
 });
@@ -58,19 +58,19 @@ client.on('messageCreate', async (message) => {
         
         const commandsEmbed = new EmbedBuilder()
             .setColor(COLORS.BLURPLE)
-            .setTitle('📋 الأوامر المتاحة')
-            .setDescription('اكتب أي من هذه الأوامر:')
+            .setTitle('📋 Available Commands')
+            .setDescription('Type any of these commands:')
             .addFields(
-                { name: '!help', value: 'عرض دليل المساعدة الكامل', inline: true },
-                { name: '!create', value: 'إنشاء خريطة طريق جديدة', inline: true },
-                { name: '!addtask', value: 'إضافة مهمة جديدة', inline: true },
-                { name: '!tasks', value: 'عرض المهام مع الأرقام', inline: true },
-                { name: '!done', value: 'إنهاء مهمة بالرقم', inline: true },
-                { name: '!taskstats', value: 'إحصائيات المهام (إداري)', inline: true },
-                { name: '!myroadmaps', value: 'عرض خرائطك المتاحة', inline: true },
-                { name: '!showroadmap', value: 'عرض تفاصيل خريطة معينة', inline: true }
+                { name: '!help', value: 'Show complete help guide', inline: true },
+                { name: '!create', value: 'Create new roadmap', inline: true },
+                { name: '!addtask', value: 'Add new task', inline: true },
+                { name: '!tasks', value: 'Show tasks with numbers', inline: true },
+                { name: '!done', value: 'Complete task by number', inline: true },
+                { name: '!taskstats', value: 'Task statistics (admin)', inline: true },
+                { name: '!myroadmaps', value: 'Show your available roadmaps', inline: true },
+                { name: '!showroadmap', value: 'Show roadmap details', inline: true }
             )
-            .setFooter({ text: 'اكتب !help للحصول على شرح مفصل' })
+            .setFooter({ text: 'Type !help for detailed explanation' })
             .setTimestamp();
             
         return message.reply({ embeds: [commandsEmbed] }).catch(() => {});
@@ -91,8 +91,8 @@ client.on('messageCreate', async (message) => {
         const availableCommands = Array.from(client.commands.keys()).slice(0, 5);
         const suggestionEmbed = new EmbedBuilder()
             .setColor(COLORS.YELLOW)
-            .setTitle('❓ أمر غير معروف')
-            .setDescription(`الأمر \`!${commandName}\` غير موجود.\n\n**الأوامر المتاحة:**\n${availableCommands.map(cmd => `\`!${cmd}\``).join(', ')}\n\nاكتب \`!help\` لعرض دليل الأوامر الكامل.`)
+            .setTitle('❓ Unknown Command')
+            .setDescription(`Command \`!${commandName}\` doesn't exist.\n\n**Available commands:**\n${availableCommands.map(cmd => `\`!${cmd}\``).join(', ')}\n\nType \`!help\` to see the complete command guide.`)
             .setTimestamp();
         
         return message.reply({ embeds: [suggestionEmbed] }).catch(() => {});
@@ -109,8 +109,8 @@ client.on('messageCreate', async (message) => {
         
         const errorEmbed = new EmbedBuilder()
             .setColor(COLORS.RED)
-            .setTitle('❌ خطأ في الأمر')
-            .setDescription('حدث خطأ أثناء تنفيذ الأمر. يرجى المحاولة مرة أخرى.')
+            .setTitle('❌ Command Error')
+            .setDescription('An error occurred while executing the command. Please try again.')
             .setTimestamp();
         
         message.reply({ embeds: [errorEmbed] }).catch(() => {});

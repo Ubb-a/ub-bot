@@ -66,15 +66,30 @@
           "status": "pending",
           "createdAt": "2025-06-25T00:51:38.982Z",
           "createdBy": "550049617564270642",
-          "completedBy": [],
+          "completedBy": [
+            "550049617564270642"
+          ],
           "messageId": "1387233748692504617",
           "channelId": "1353795780925984810",
           "emoji": "💻",
           "hiddenBy": []
+        },
+        {
+          "id": 4,
+          "title": "hhh",
+          "emoji": "1️⃣",
+          "status": "pending",
+          "createdBy": "550049617564270642",
+          "completedBy": [
+            "550049617564270642"
+          ],
+          "hiddenBy": [],
+          "messageId": "1387248426890297394",
+          "channelId": "1353795780925984810"
         }
       ]
     }
   },
-  "lastUpdated": "2025-06-25T01:43:01.107Z",
+  "lastUpdated": "2025-06-25T01:51:10.229Z",
   "version": "1.0.0"
 }

@@ -9,29 +9,59 @@ module.exports = {
     
     async execute(message, args) {
         try {
-            // Check if roadmap name is provided
-            if (args.length === 0) {
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(COLORS.RED)
-                    .setTitle('❌ اسم الخريطة مفقود')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!tasks تطوير-المواقع\``)
-                    .setTimestamp();
-                return message.reply({ embeds: [errorEmbed] });
-            }
-
-            const roadmapName = args.join(' ');
             const member = message.member;
             const guildId = message.guild.id;
+            const { getRoadmaps } = require('../utils/dataManager');
+            
+            let roadmap = null;
+            let roadmapKey = '';
 
-            // Get roadmap
-            const roadmapKey = `${guildId}_${roadmapName.toLowerCase()}`;
-            const roadmap = getRoadmap(roadmapKey);
+            if (args.length === 0) {
+                // No roadmap name provided, find user's accessible roadmap
+                const allRoadmaps = getRoadmaps();
+                const userRoadmaps = [];
+
+                for (const [key, rm] of Object.entries(allRoadmaps)) {
+                    if (key.startsWith(`${guildId}_`) && member.roles.cache.has(rm.roleId)) {
+                        userRoadmaps.push({ key, roadmap: rm });
+                    }
+                }
+
+                if (userRoadmaps.length === 0) {
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(COLORS.RED)
+                        .setTitle('❌ No Access')
+                        .setDescription('You don\'t have access to any roadmaps in this server.')
+                        .setTimestamp();
+                    return message.reply({ embeds: [errorEmbed] });
+                }
+
+                if (userRoadmaps.length === 1) {
+                    roadmap = userRoadmaps[0].roadmap;
+                    roadmapKey = userRoadmaps[0].key;
+                } else {
+                    // Multiple roadmaps available
+                    const roadmapNames = userRoadmaps.map(rm => rm.roadmap.name).join(', ');
+                    const errorEmbed = new EmbedBuilder()
+                        .setColor(COLORS.YELLOW)
+                        .setTitle('🤔 Multiple Roadmaps Available')
+                        .setDescription(`You have access to multiple roadmaps: ${roadmapNames}\n\nPlease specify which one:\n\`!tasks roadmap_name\``)
+                        .setTimestamp();
+                    return message.reply({ embeds: [errorEmbed] });
+                }
+            } else {
+                // Roadmap name provided
+                const roadmapName = args.join(' ');
+                roadmapKey = `${guildId}_${roadmapName.toLowerCase()}`;
+                roadmap = getRoadmap(roadmapKey);
+            }
 
             if (!roadmap) {
+                const roadmapName = args.join(' ');
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ الخريطة غير موجودة')
-                    .setDescription(`لا توجد خريطة طريق بالاسم "${roadmapName}" في هذا السيرفر.`)
+                    .setTitle('❌ Roadmap Not Found')
+                    .setDescription(`No roadmap named "${roadmapName}" exists in this server.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -41,8 +71,8 @@ module.exports = {
                 const role = message.guild.roles.cache.get(roadmap.roleId);
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ ممنوع الوصول')
-                    .setDescription(`تحتاج رول ${role ? role.toString() : 'غير موجود'} لعرض مهام هذه الخريطة.`)
+                    .setTitle('❌ Access Denied')
+                    .setDescription(`You need the ${role ? role.toString() : 'required'} role to view tasks in this roadmap.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -58,8 +88,8 @@ module.exports = {
             if (visibleTasks.length === 0) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.YELLOW)
-                    .setTitle('📋 لا توجد مهام')
-                    .setDescription(`لا توجد مهام مرئية في خريطة "${roadmap.name}".`)
+                    .setTitle('📋 No Tasks')
+                    .setDescription(`No visible tasks in "${roadmap.name}" roadmap.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -67,11 +97,11 @@ module.exports = {
             // Create tasks embed
             const embed = new EmbedBuilder()
                 .setColor(COLORS.BLURPLE)
-                .setTitle(`📋 مهام خريطة: ${roadmap.name}`)
-                .setDescription(`إجمالي المهام المرئية: ${visibleTasks.length}`)
+                .setTitle(`📋 Tasks: ${roadmap.name}`)
+                .setDescription(`Total visible tasks: ${visibleTasks.length}`)
                 .setTimestamp()
                 .setFooter({
-                    text: `${message.guild.name} | استخدم !done رقم_المهمة`,
+                    text: `${message.guild.name} | Use !done task_number`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 
@@ -84,23 +114,23 @@ module.exports = {
                 
                 embed.addFields({
                     name: `${statusEmoji} ${taskNumber}. ${task.title}`,
-                    value: `**رقم المهمة:** ${taskNumber}`,
+                    value: `**Task Number:** ${taskNumber}`,
                     inline: false
                 });
             }
 
             if (visibleTasks.length > 15) {
                 embed.addFields({
-                    name: '📌 ملاحظة',
-                    value: `يتم عرض أول 15 مهمة فقط. إجمالي المهام: ${visibleTasks.length}`,
+                    name: '📌 Note',
+                    value: `Showing first 15 tasks only. Total tasks: ${visibleTasks.length}`,
                     inline: false
                 });
             }
 
             // Add instructions for completing tasks
             embed.addFields({
-                name: '💡 كيفية الاستخدام',
-                value: `لتمييز مهمة كمكتملة، اكتب: \`!done رقم_المهمة\`\nمثال: \`!done 2\` لتمييز المهمة رقم 2 كمكتملة`,
+                name: '💡 How to Use',
+                value: `To mark a task as completed, type: \`!done task_number\`\nExample: \`!done 2\` to complete task number 2`,
                 inline: false
             });
 

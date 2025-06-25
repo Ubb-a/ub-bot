@@ -34,8 +34,8 @@ module.exports = {
             if (inputParts.length < 2) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ تنسيق خاطئ')
-                    .setDescription('**الاستخدام:** `!addtask اسم_الخريطة عنوان_المهمة`\n**مثال:** `!addtask back_end تعلم JavaScript`')
+                    .setTitle('❌ Wrong Format')
+                    .setDescription('**Usage:** `!addtask roadmap_name task_title`\n**Example:** `!addtask backend Learn JavaScript`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -46,8 +46,8 @@ module.exports = {
             if (!roadmapName || !taskTitle) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ بيانات ناقصة')
-                    .setDescription('تأكد من كتابة اسم الخريطة وعنوان المهمة.')
+                    .setTitle('❌ Missing Data')
+                    .setDescription('Make sure to write the roadmap name and task title.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -59,8 +59,8 @@ module.exports = {
             if (!roadmap) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ الخريطة غير موجودة')
-                    .setDescription(`خريطة الطريق "${roadmapName}" غير موجودة في هذا السيرفر.`)
+                    .setTitle('❌ Roadmap Not Found')
+                    .setDescription(`Roadmap "${roadmapName}" doesn't exist in this server.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -70,8 +70,8 @@ module.exports = {
                 const role = message.guild.roles.cache.get(roadmap.roleId);
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ ممنوع الوصول')
-                    .setDescription(`تحتاج رول ${role ? role.toString() : 'غير موجود'} للتعديل على هذه الخريطة.`)
+                    .setTitle('❌ Access Denied')
+                    .setDescription(`You need the ${role ? role.toString() : 'required'} role to edit this roadmap.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -111,18 +111,18 @@ module.exports = {
             // Create task embed
             const taskEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
-                .setTitle('✅ تم إضافة المهمة بنجاح!')
-                .setDescription(`**خريطة الطريق:** ${roadmap.name}\n**المهمة:** ${taskTitle}`)
+                .setTitle('✅ Task Added Successfully!')
+                .setDescription(`**Roadmap:** ${roadmap.name}\n**Task:** ${taskTitle}`)
                 .addFields([
                     {
-                        name: '💡 كيفية الاستخدام',
-                        value: `استخدم \`!tasks ${roadmap.name.toLowerCase()}\` لعرض المهام\nاستخدم \`!done رقم_المهمة\` لإنهاء المهام`,
+                        name: '💡 How to Use',
+                        value: `Use \`!tasks ${roadmap.name.toLowerCase()}\` to view tasks\nUse \`!done task_number\` to complete tasks`,
                         inline: false
                     }
                 ])
                 .setTimestamp()
                 .setFooter({
-                    text: `إجمالي المهام: ${roadmap.tasks.length}`,
+                    text: `Total tasks: ${roadmap.tasks.length}`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 

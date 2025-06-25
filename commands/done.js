@@ -12,8 +12,8 @@ module.exports = {
             if (args.length === 0) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ رقم المهمة مفقود')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!done 2\` أو \`!done 2 back_end\``)
+                    .setTitle('❌ Task Number Missing')
+                    .setDescription(`**Usage:** ${this.usage}\n**Example:** \`!done 2\` or \`!done 2 backend\``)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -22,8 +22,8 @@ module.exports = {
             if (isNaN(taskNumber) || taskNumber < 1) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ رقم غير صحيح')
-                    .setDescription('يرجى إدخال رقم صحيح للمهمة (1، 2، 3...)')
+                    .setTitle('❌ Invalid Number')
+                    .setDescription('Please enter a valid task number (1, 2, 3...)')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -44,8 +44,8 @@ module.exports = {
                 if (!targetRoadmap) {
                     const errorEmbed = new EmbedBuilder()
                         .setColor(COLORS.RED)
-                        .setTitle('❌ الخريطة غير موجودة')
-                        .setDescription(`لا توجد خريطة طريق بالاسم "${roadmapName}" في هذا السيرفر.`)
+                        .setTitle('❌ Roadmap Not Found')
+                        .setDescription(`No roadmap named "${roadmapName}" exists in this server.`)
                         .setTimestamp();
                     return message.reply({ embeds: [errorEmbed] });
                 }
@@ -63,8 +63,8 @@ module.exports = {
                 if (userRoadmaps.length === 0) {
                     const errorEmbed = new EmbedBuilder()
                         .setColor(COLORS.RED)
-                        .setTitle('❌ لا توجد خرائط متاحة')
-                        .setDescription('ليس لديك الصلاحية للوصول إلى أي خريطة طريق في هذا السيرفر.')
+                        .setTitle('❌ No Available Roadmaps')
+                        .setDescription('You don\'t have permission to access any roadmap in this server.')
                         .setTimestamp();
                     return message.reply({ embeds: [errorEmbed] });
                 }
@@ -74,11 +74,11 @@ module.exports = {
                     roadmapKey = userRoadmaps[0].key;
                 } else {
                     // Multiple roadmaps available, ask user to specify
-                    const roadmapNames = userRoadmaps.map(rm => rm.roadmap.name).join('، ');
+                    const roadmapNames = userRoadmaps.map(rm => rm.roadmap.name).join(', ');
                     const errorEmbed = new EmbedBuilder()
                         .setColor(COLORS.YELLOW)
-                        .setTitle('🤔 أكثر من خريطة متاحة')
-                        .setDescription(`لديك الوصول إلى عدة خرائط: ${roadmapNames}\n\nيرجى تحديد اسم الخريطة:\n\`!done ${taskNumber} اسم_الخريطة\``)
+                        .setTitle('🤔 Multiple Roadmaps Available')
+                        .setDescription(`You have access to multiple roadmaps: ${roadmapNames}\n\nPlease specify the roadmap name:\n\`!done ${taskNumber} roadmap_name\``)
                         .setTimestamp();
                     return message.reply({ embeds: [errorEmbed] });
                 }
@@ -89,8 +89,8 @@ module.exports = {
                 const role = message.guild.roles.cache.get(targetRoadmap.roleId);
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ ممنوع الوصول')
-                    .setDescription(`تحتاج رول ${role ? role.toString() : 'غير موجود'} للتفاعل مع مهام هذه الخريطة.`)
+                    .setTitle('❌ Access Denied')
+                    .setDescription(`You need the ${role ? role.toString() : 'required'} role to interact with tasks in this roadmap.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -105,8 +105,8 @@ module.exports = {
             if (visibleTasks.length === 0) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.YELLOW)
-                    .setTitle('📋 لا توجد مهام')
-                    .setDescription(`لا توجد مهام مرئية في خريطة "${targetRoadmap.name}".`)
+                    .setTitle('📋 No Tasks')
+                    .setDescription(`No visible tasks in "${targetRoadmap.name}" roadmap.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -114,8 +114,8 @@ module.exports = {
             if (taskNumber > visibleTasks.length) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ رقم المهمة غير موجود')
-                    .setDescription(`رقم المهمة ${taskNumber} غير موجود. إجمالي المهام المتاحة: ${visibleTasks.length}`)
+                    .setTitle('❌ Task Number Not Found')
+                    .setDescription(`Task number ${taskNumber} doesn't exist. Available tasks: ${visibleTasks.length}`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -128,8 +128,8 @@ module.exports = {
             if (taskToComplete.completedBy.includes(userId)) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.YELLOW)
-                    .setTitle('⚠️ مهمة مكتملة بالفعل')
-                    .setDescription(`لقد قمت بالفعل بتمييز المهمة "${taskToComplete.title}" كمكتملة.`)
+                    .setTitle('⚠️ Task Already Completed')
+                    .setDescription(`You have already marked the task "${taskToComplete.title}" as completed.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -140,23 +140,23 @@ module.exports = {
 
             const completionEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
-                .setTitle('🎉 تهانينا!')
-                .setDescription(`لقد قمت بتمييز المهمة "${taskToComplete.title}" كمكتملة!`)
+                .setTitle('🎉 Congratulations!')
+                .setDescription(`You have marked the task "${taskToComplete.title}" as completed!`)
                 .addFields([
                     {
-                        name: '📊 تفاصيل المهمة',
-                        value: `**الخريطة:** ${targetRoadmap.name}\n**المهمة:** ${taskToComplete.title}`,
+                        name: '📊 Task Details',
+                        value: `**Roadmap:** ${targetRoadmap.name}\n**Task:** ${taskToComplete.title}`,
                         inline: false
                     },
                     {
-                        name: '📈 التقدم',
-                        value: `إجمالي من أنجز هذه المهمة: ${taskToComplete.completedBy.length} شخص`,
+                        name: '📈 Progress',
+                        value: `Total people who completed this task: ${taskToComplete.completedBy.length}`,
                         inline: false
                     }
                 ])
                 .setTimestamp()
                 .setFooter({
-                    text: `${targetRoadmap.name} | إنجاز مهمة`,
+                    text: `${targetRoadmap.name} | Task Completion`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 
