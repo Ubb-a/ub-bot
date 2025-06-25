@@ -96,11 +96,14 @@ This is a Discord bot application designed to manage role-based roadmaps within 
   - Built role-based roadmap management system
   - Implemented command handlers (!create, !myroadmaps, !showroadmap, !help)
   - Added comprehensive Arabic help command with detailed explanations
+  - All bot responses are now in Arabic
+  - Fixed error handling to prevent duplicate error messages
+  - Added quick command listing when user types just "!"
+  - Added unknown command handling with helpful suggestions
   - Added JSON data persistence with backup functionality
   - Configured Express web server for monitoring and API endpoints
   - Successfully connected Discord bot with proper intents
   - Bot is online and serving Discord servers
-  - **Issue identified**: Bot requires "Message Content Intent" enabled in Discord Developer Portal to read commands
 
 ## Changelog
 

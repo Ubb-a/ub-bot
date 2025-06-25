@@ -36,8 +36,32 @@ client.once('ready', () => {
 
 // Message handler for commands
 client.on('messageCreate', async (message) => {
-    // Ignore bot messages and messages without prefix
-    if (message.author.bot || !message.content.startsWith('!')) return;
+    // Ignore bot messages
+    if (message.author.bot) return;
+    
+    // Check if message starts with !
+    if (!message.content.startsWith('!')) return;
+
+    // If user just types "!" show available commands
+    if (message.content.trim() === '!') {
+        const { EmbedBuilder } = require('discord.js');
+        const { COLORS } = require('./utils/embedBuilder');
+        
+        const commandsEmbed = new EmbedBuilder()
+            .setColor(COLORS.BLURPLE)
+            .setTitle('📋 الأوامر المتاحة')
+            .setDescription('اكتب أي من هذه الأوامر:')
+            .addFields(
+                { name: '!help', value: 'عرض دليل المساعدة الكامل', inline: true },
+                { name: '!create', value: 'إنشاء خريطة طريق جديدة', inline: true },
+                { name: '!myroadmaps', value: 'عرض خرائطك المتاحة', inline: true },
+                { name: '!showroadmap', value: 'عرض تفاصيل خريطة معينة', inline: true }
+            )
+            .setFooter({ text: 'اكتب !help للحصول على شرح مفصل' })
+            .setTimestamp();
+            
+        return message.reply({ embeds: [commandsEmbed] }).catch(() => {});
+    }
 
     // Parse command and arguments
     const args = message.content.slice(1).trim().split(/ +/);
@@ -45,7 +69,18 @@ client.on('messageCreate', async (message) => {
 
     // Get command from collection
     const command = client.commands.get(commandName);
-    if (!command) return;
+    if (!command) {
+        const { EmbedBuilder } = require('discord.js');
+        const { COLORS } = require('./utils/embedBuilder');
+        
+        const unknownEmbed = new EmbedBuilder()
+            .setColor(COLORS.YELLOW)
+            .setTitle('❓ أمر غير معروف')
+            .setDescription(`الأمر \`!${commandName}\` غير موجود.\n\nاستخدم \`!\` لرؤية الأوامر المتاحة أو \`!help\` للمساعدة.`)
+            .setTimestamp();
+            
+        return message.reply({ embeds: [unknownEmbed] }).catch(() => {});
+    }
 
     try {
         // Execute command
