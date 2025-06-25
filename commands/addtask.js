@@ -29,29 +29,25 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Find where the task content starts (after roadmap name)
-            const fullContent = args.join(' ');
-            const parts = fullContent.split('|');
-            
-            if (parts.length < 2) {
+            // Parse roadmap name and task title
+            const inputParts = args.join(' ').split(' ');
+            if (inputParts.length < 2) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ فاصل مفقود')
-                    .setDescription('استخدم | للفصل بين عنوان المهمة والوصف\n**مثال:** `!addtask اسم_الخريطة عنوان المهمة | وصف المهمة`')
+                    .setTitle('❌ تنسيق خاطئ')
+                    .setDescription('**الاستخدام:** `!addtask اسم_الخريطة عنوان_المهمة`\n**مثال:** `!addtask back_end تعلم JavaScript`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            const roadmapAndTitle = parts[0].trim().split(' ');
-            const roadmapName = roadmapAndTitle[0];
-            const taskTitle = roadmapAndTitle.slice(1).join(' ');
-            const taskDescription = parts[1].trim();
+            const roadmapName = inputParts[0];
+            const taskTitle = inputParts.slice(1).join(' ');
 
-            if (!roadmapName || !taskTitle || !taskDescription) {
+            if (!roadmapName || !taskTitle) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ بيانات ناقصة')
-                    .setDescription('تأكد من كتابة اسم الخريطة وعنوان المهمة والوصف بشكل صحيح.')
+                    .setDescription('تأكد من كتابة اسم الخريطة وعنوان المهمة.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -101,10 +97,8 @@ module.exports = {
             const newTask = {
                 id: newTaskId,
                 title: taskTitle,
-                description: taskDescription,
                 emoji: taskEmoji,
                 status: 'pending',
-                createdAt: new Date().toISOString(),
                 createdBy: message.author.id,
                 completedBy: [], // Array to track who completed it
                 hiddenBy: [] // Array to track who hid it
@@ -114,26 +108,21 @@ module.exports = {
             roadmap.tasks.push(newTask);
             saveRoadmap(roadmapKey, roadmap);
 
-            // Create task embed with reactions
+            // Create task embed
             const taskEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
                 .setTitle('✅ تم إضافة المهمة بنجاح!')
-                .setDescription(`**خريطة الطريق:** ${roadmap.name}\n**المهمة:** ${taskEmoji} ${taskTitle}\n**الوصف:** ${taskDescription}`)
+                .setDescription(`**خريطة الطريق:** ${roadmap.name}\n**المهمة:** ${taskTitle}`)
                 .addFields([
                     {
-                        name: '📊 تفاصيل المهمة',
-                        value: `**الرقم:** ${newTaskId}\n**الإيموجي:** ${taskEmoji}\n**الحالة:** معلقة\n**تم الإنشاء بواسطة:** ${message.author}`,
-                        inline: false
-                    },
-                    {
-                        name: '💡 كيفية التفاعل',
-                        value: `استخدم \`!done رقم_المهمة\` لتمييز المهام كمكتملة\nاستخدم \`!tasks ${roadmap.name.toLowerCase()}\` لعرض جميع المهام`,
+                        name: '💡 كيفية الاستخدام',
+                        value: `استخدم \`!tasks ${roadmap.name.toLowerCase()}\` لعرض المهام\nاستخدم \`!done رقم_المهمة\` لإنهاء المهام`,
                         inline: false
                     }
                 ])
                 .setTimestamp()
                 .setFooter({
-                    text: `معرف المهمة: ${newTaskId} | إيموجي: ${taskEmoji}`,
+                    text: `إجمالي المهام: ${roadmap.tasks.length}`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 

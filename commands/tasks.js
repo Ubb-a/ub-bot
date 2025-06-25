@@ -84,7 +84,7 @@ module.exports = {
                 
                 embed.addFields({
                     name: `${statusEmoji} ${taskNumber}. ${task.title}`,
-                    value: `**الوصف:** ${task.description}\n**الرقم:** ${task.id}\n**تاريخ الإنشاء:** ${new Date(task.createdAt).toLocaleDateString('ar-EG')}`,
+                    value: `**رقم المهمة:** ${taskNumber}`,
                     inline: false
                 });
             }

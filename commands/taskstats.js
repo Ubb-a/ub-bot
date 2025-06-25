@@ -69,7 +69,6 @@ module.exports = {
 
             // Overall statistics
             let totalCompletions = 0;
-            let totalHides = 0;
             let activeUsers = new Set();
 
             tasks.forEach(task => {
@@ -77,15 +76,11 @@ module.exports = {
                     totalCompletions += task.completedBy.length;
                     task.completedBy.forEach(userId => activeUsers.add(userId));
                 }
-                if (task.hiddenBy) {
-                    totalHides += task.hiddenBy.length;
-                    task.hiddenBy.forEach(userId => activeUsers.add(userId));
-                }
             });
 
             statsEmbed.addFields({
                 name: '📈 إحصائيات عامة',
-                value: `**إجمالي المهام:** ${tasks.length}\n**إجمالي الإنجازات:** ${totalCompletions}\n**إجمالي الإخفاءات:** ${totalHides}\n**المستخدمين النشطين:** ${activeUsers.size}`,
+                value: `**إجمالي المهام:** ${tasks.length}\n**إجمالي الإنجازات:** ${totalCompletions}\n**المستخدمين النشطين:** ${activeUsers.size}`,
                 inline: false
             });
 
@@ -108,10 +103,10 @@ module.exports = {
                     if (task.completedBy.length > 3) completedUsers += ` +${task.completedBy.length - 3}`;
                 }
                 
-                taskDetails += `${taskEmoji} **${task.title}**\n`;
+                taskDetails += `${i + 1}. **${task.title}**\n`;
                 taskDetails += `   ✅ مكتملة: ${completedCount}`;
                 if (completedUsers) taskDetails += ` (${completedUsers})`;
-                taskDetails += `\n   ❌ مخفية: ${hiddenCount}\n\n`;
+                taskDetails += `\n\n`;
             }
 
             if (taskDetails) {
@@ -143,24 +138,9 @@ module.exports = {
                     const completedTasks = tasks.filter(task => 
                         task.completedBy && task.completedBy.includes(userId)
                     );
-                    const hiddenTasks = tasks.filter(task => 
-                        task.hiddenBy && task.hiddenBy.includes(userId)
-                    );
                     
-                    if (completedTasks.length > 0 || hiddenTasks.length > 0) {
-                        userDetails += `**${memberName}:**\n`;
-                        
-                        if (completedTasks.length > 0) {
-                            const completedEmojis = completedTasks.map(t => t.emoji || '📝').join(' ');
-                            userDetails += `   ✅ مكتملة: ${completedEmojis}\n`;
-                        }
-                        
-                        if (hiddenTasks.length > 0) {
-                            const hiddenEmojis = hiddenTasks.map(t => t.emoji || '📝').join(' ');
-                            userDetails += `   ❌ مخفية: ${hiddenEmojis}\n`;
-                        }
-                        
-                        userDetails += '\n';
+                    if (completedTasks.length > 0) {
+                        userDetails += `**${memberName}:** ${completedTasks.length} مهمة مكتملة\n`;
                         userCount++;
                     }
                 }

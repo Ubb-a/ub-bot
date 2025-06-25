@@ -145,7 +145,7 @@ module.exports = {
                 .addFields([
                     {
                         name: '📊 تفاصيل المهمة',
-                        value: `**الخريطة:** ${targetRoadmap.name}\n**المهمة:** ${taskToComplete.title}\n**الوصف:** ${taskToComplete.description}`,
+                        value: `**الخريطة:** ${targetRoadmap.name}\n**المهمة:** ${taskToComplete.title}`,
                         inline: false
                     },
                     {
@@ -156,7 +156,7 @@ module.exports = {
                 ])
                 .setTimestamp()
                 .setFooter({
-                    text: `معرف المهمة: ${taskToComplete.id}`,
+                    text: `${targetRoadmap.name} | إنجاز مهمة`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 

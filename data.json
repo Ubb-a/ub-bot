@@ -51,7 +51,9 @@
           "status": "pending",
           "createdAt": "2025-06-25T00:51:04.844Z",
           "createdBy": "550049617564270642",
-          "completedBy": [],
+          "completedBy": [
+            "550049617564270642"
+          ],
           "messageId": "1387233605176131645",
           "channelId": "1353795780925984810",
           "emoji": "📚",
@@ -73,6 +75,6 @@
       ]
     }
   },
-  "lastUpdated": "2025-06-25T01:06:34.292Z",
+  "lastUpdated": "2025-06-25T01:43:01.107Z",
   "version": "1.0.0"
 }
