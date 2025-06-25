@@ -40,7 +40,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (user.bot) return;
     
     try {
-        const { getRoadmap, saveRoadmap } = require('./utils/dataManager');
+        const { getRoadmap, saveRoadmap, getRoadmaps } = require('./utils/dataManager');
         const { EmbedBuilder } = require('discord.js');
         const { COLORS } = require('./utils/embedBuilder');
         
@@ -48,141 +48,121 @@ client.on('messageReactionAdd', async (reaction, user) => {
         const guild = message.guild;
         const member = guild.members.cache.get(user.id);
         
-        // Check if this is a task-related message
-        if (!message.embeds || message.embeds.length === 0) return;
+        console.log('🔄 Reaction detected:', reaction.emoji.name, 'from:', user.username);
         
-        // Skip if message is from bot itself
-        if (message.author.bot) return;
+        const userId = user.id;
+        const emojiName = reaction.emoji.name;
         
-        const embed = message.embeds[0];
-        const embedTitle = embed.title;
+        // Find roadmap by searching all roadmaps for this emoji
+        const allRoadmaps = getRoadmaps();
+        let targetRoadmap = null;
+        let roadmapKey = '';
         
-        // Handle task completion/hiding - improved detection
-        if (embedTitle && (embedTitle.includes('مهام خريطة') || embedTitle.includes('تم إضافة المهمة') || embed.description)) {
-            console.log('Processing reaction:', reaction.emoji.name, 'from user:', user.username);
-            
-            // Find roadmap name from various sources
-            let roadmapName = '';
-            let roadmapKey = '';
-            
-            // Try to extract roadmap name from title
-            if (embedTitle && embedTitle.includes('مهام خريطة:')) {
-                roadmapName = embedTitle.split('مهام خريطة: ')[1];
-            } else if (embed.description && embed.description.includes('خريطة الطريق:')) {
-                const lines = embed.description.split('\n');
-                const roadmapLine = lines.find(line => line.includes('خريطة الطريق:'));
-                if (roadmapLine) {
-                    roadmapName = roadmapLine.split('خريطة الطريق: ')[1].split('\n')[0];
+        // Search through all roadmaps in this guild
+        for (const [key, roadmap] of Object.entries(allRoadmaps)) {
+            if (key.startsWith(`${guild.id}_`) && roadmap.tasks) {
+                // Check if any task has this emoji
+                const taskWithEmoji = roadmap.tasks.find(task => task.emoji === emojiName);
+                if (taskWithEmoji) {
+                    targetRoadmap = roadmap;
+                    roadmapKey = key;
+                    console.log('✅ Found roadmap with emoji:', roadmap.name, 'task:', taskWithEmoji.title);
+                    break;
                 }
             }
-            
-            // If still no roadmap name, try to find from all roadmaps
-            if (!roadmapName) {
-                const { getRoadmaps } = require('./utils/dataManager');
-                const allRoadmaps = getRoadmaps();
+        }
+        
+        // Handle hide emoji (❌) separately - applies to any roadmap message
+        if (emojiName === '❌' && !targetRoadmap) {
+            // Try to extract roadmap from embed
+            if (message.embeds && message.embeds.length > 0) {
+                const embed = message.embeds[0];
+                const embedTitle = embed.title;
                 
-                // Look for roadmap by checking if any task has this emoji
-                for (const [key, roadmap] of Object.entries(allRoadmaps)) {
-                    if (key.startsWith(`${guild.id}_`) && roadmap.tasks) {
-                        const taskWithEmoji = roadmap.tasks.find(task => task.emoji === reaction.emoji.name);
-                        if (taskWithEmoji) {
-                            roadmapKey = key;
-                            roadmapName = roadmap.name;
-                            break;
-                        }
-                    }
+                if (embedTitle && embedTitle.includes('مهام خريطة:')) {
+                    const roadmapName = embedTitle.split('مهام خريطة: ')[1];
+                    roadmapKey = `${guild.id}_${roadmapName.toLowerCase()}`;
+                    targetRoadmap = getRoadmap(roadmapKey);
+                    console.log('📋 Found roadmap for hide:', roadmapName);
                 }
-            } else {
-                roadmapKey = `${guild.id}_${roadmapName.toLowerCase()}`;
             }
+        }
+        
+        if (!targetRoadmap) {
+            console.log('❌ No roadmap found for emoji:', emojiName);
+            return;
+        }
+        
+        // Check if user has required role
+        if (!member.roles.cache.has(targetRoadmap.roleId)) {
+            console.log('⛔ User lacks required role');
+            return;
+        }
+        
+        let updated = false;
+        
+        if (emojiName === '❌') {
+            // Hide all tasks for this user
+            targetRoadmap.tasks.forEach(task => {
+                if (!task.hiddenBy) task.hiddenBy = [];
+                if (!task.hiddenBy.includes(userId)) {
+                    task.hiddenBy.push(userId);
+                    updated = true;
+                }
+            });
             
-            if (!roadmapName || !roadmapKey) {
-                console.log('Could not find roadmap for reaction:', reaction.emoji.name);
-                return;
+            if (updated) {
+                console.log('👁️ Hidden tasks for user:', userId);
+                
+                const hideEmbed = new EmbedBuilder()
+                    .setColor(COLORS.YELLOW)
+                    .setTitle('👁️ تم الإخفاء')
+                    .setDescription(`تم إخفاء مهام خريطة "${targetRoadmap.name}" من قائمتك الشخصية.`)
+                    .setTimestamp();
+                
+                message.channel.send({ embeds: [hideEmbed] }).catch(console.error);
             }
+        } else {
+            // Handle task completion
+            const taskWithEmoji = targetRoadmap.tasks.find(task => task.emoji === emojiName);
             
-            const roadmap = getRoadmap(roadmapKey);
-            if (!roadmap) {
-                console.log('Roadmap not found:', roadmapKey);
-                return;
-            }
-            
-            // Check if user has required role
-            if (!member.roles.cache.has(roadmap.roleId)) {
-                console.log('User does not have required role');
-                return;
-            }
-            
-            const userId = user.id;
-            let updated = false;
-            
-            console.log('Looking for task with emoji:', reaction.emoji.name);
-            console.log('Available tasks:', roadmap.tasks.map(t => ({ id: t.id, emoji: t.emoji, title: t.title })));
-            
-            // Handle task-specific emoji reactions (completion)
-            const taskWithEmoji = roadmap.tasks.find(task => task.emoji === reaction.emoji.name);
             if (taskWithEmoji) {
-                console.log('Found task with emoji:', taskWithEmoji.title);
-                
-                // Mark specific task as completed for this user
                 if (!taskWithEmoji.completedBy) taskWithEmoji.completedBy = [];
+                
                 if (!taskWithEmoji.completedBy.includes(userId)) {
                     taskWithEmoji.completedBy.push(userId);
                     updated = true;
                     
-                    console.log('Marked task as completed by user:', userId);
+                    console.log('🎉 Task completed by user:', userId, 'Task:', taskWithEmoji.title);
                     
-                    // Send completion message for specific task
                     const completionEmbed = new EmbedBuilder()
                         .setColor(COLORS.GREEN)
                         .setTitle('🎉 تهانينا!')
                         .setDescription(`لقد قمت بتمييز المهمة "${taskWithEmoji.emoji} ${taskWithEmoji.title}" كمكتملة!`)
+                        .addFields({
+                            name: '📊 التقدم',
+                            value: `إجمالي من أنجز هذه المهمة: ${taskWithEmoji.completedBy.length} شخص`,
+                            inline: false
+                        })
                         .setTimestamp();
                     
                     message.channel.send({ embeds: [completionEmbed] }).catch(console.error);
                 } else {
-                    console.log('Task already completed by this user');
+                    console.log('⚠️ Task already completed by this user');
                 }
-                
-            } else if (reaction.emoji.name === '❌') {
-                console.log('Processing hide reaction');
-                
-                // Hide all tasks for this user
-                roadmap.tasks.forEach(task => {
-                    if (!task.hiddenBy) task.hiddenBy = [];
-                    if (!task.hiddenBy.includes(userId)) {
-                        task.hiddenBy.push(userId);
-                        updated = true;
-                    }
-                });
-                
-                if (updated) {
-                    console.log('Hidden tasks for user:', userId);
-                    
-                    // Send hide message
-                    const hideEmbed = new EmbedBuilder()
-                        .setColor(COLORS.YELLOW)
-                        .setTitle('👁️ تم الإخفاء')
-                        .setDescription(`تم إخفاء مهام خريطة "${roadmapName}" من قائمتك الشخصية.`)
-                        .setTimestamp();
-                    
-                    message.channel.send({ embeds: [hideEmbed] }).catch(console.error);
-                }
-            } else {
-                console.log('No matching emoji found for:', reaction.emoji.name);
             }
-            
-            if (updated) {
-                saveRoadmap(roadmapKey, roadmap);
-                console.log('Saved roadmap with updates');
-            }
-            
-            // Remove user's reaction
-            reaction.users.remove(user.id).catch(console.error);
         }
         
+        if (updated) {
+            saveRoadmap(roadmapKey, targetRoadmap);
+            console.log('💾 Saved roadmap:', roadmapKey);
+        }
+        
+        // Remove user's reaction
+        reaction.users.remove(user.id).catch(console.error);
+        
     } catch (err) {
-        console.error('Error handling reaction:', err);
+        console.error('❌ Error handling reaction:', err);
     }
 });
 

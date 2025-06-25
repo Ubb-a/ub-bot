@@ -39,7 +39,9 @@
           "status": "pending",
           "createdAt": "2025-06-25T00:30:13.247Z",
           "emoji": "📝",
-          "completedBy": [],
+          "completedBy": [
+            "550049617564270642"
+          ],
           "hiddenBy": []
         },
         {
@@ -71,6 +73,6 @@
       ]
     }
   },
-  "lastUpdated": "2025-06-25T01:01:47.514Z",
+  "lastUpdated": "2025-06-25T01:06:34.292Z",
   "version": "1.0.0"
 }
