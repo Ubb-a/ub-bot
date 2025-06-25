@@ -73,12 +73,11 @@ client.on('messageCreate', async (message) => {
     if (message.content.toLowerCase().includes('يا سمكري')) {
         try {
             const { EmbedBuilder } = require('discord.js');
-            const { COLORS } = require('./utils/embedBuilder');
             
             const commandList = Array.from(client.commands.keys()).map(cmd => `\`${cmd}\``).join(', ');
             
             const embed = new EmbedBuilder()
-                .setColor(COLORS.BLUE)
+                .setColor(0x5865F2) // Discord Blurple color
                 .setTitle('🔧 يا قلب السمكري - الكوماندات اهي')
                 .setDescription(`**الكوماندات المتاحة:**\n${commandList}\n\n**للمساعدة التفصيلية:** \`help\``)
                 .setTimestamp();
