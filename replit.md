@@ -120,6 +120,11 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Removed ! prefix requirement - commands work with or without !
     - Added clear command for chat management (admin only)
     - Smart role detection for automatic roadmap access
+  - **NEW**: Added "يا سمكري" prefix system (June 25, 2025)
+    - Changed bot description to Arabic with personality
+    - Added "يا سمكري" as alternative command prefix alongside "!"
+    - Users can now use "يا سمكري help" or just "يا سمكري" to see commands
+    - All commands work with both prefixes: "!help" or "يا سمكري help"
   - **ENHANCED**: Added admin communication and management tools
     - Added dm command for sending private messages to all users with specific role
     - Added deleteroadmap command for permanent roadmap deletion with confirmation

@@ -69,25 +69,7 @@ client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;
     
-    // Check for "يا سمكري" command
-    if (message.content.toLowerCase().includes('يا سمكري')) {
-        try {
-            const { EmbedBuilder } = require('discord.js');
-            
-            const commandList = Array.from(client.commands.keys()).map(cmd => `\`${cmd}\``).join(', ');
-            
-            const embed = new EmbedBuilder()
-                .setColor(0x5865F2) // Discord Blurple color
-                .setTitle('🔧 يا قلب السمكري - الكوماندات اهي')
-                .setDescription(`**الكوماندات المتاحة:**\n${commandList}\n\n**للمساعدة التفصيلية:** \`help\``)
-                .setTimestamp();
-            
-            await message.reply({ embeds: [embed] });
-        } catch (error) {
-            console.error('Error replying to يا سمكري:', error);
-        }
-        return;
-    }
+
     
     // Check for "زعزوع" mention and respond only if ub.d is offline
     if (message.content.toLowerCase().includes('زعزوع')) {
@@ -128,46 +110,46 @@ client.on('messageCreate', async (message) => {
         return;
     }
     
-    // Check if message starts with ! or is a direct command
+    // Check if message starts with "يا سمكري", "!" or is a direct command
+    const hasSamkariPrefix = message.content.toLowerCase().startsWith('يا سمكري');
     const hasPrefix = message.content.startsWith('!');
     const isDirectCommand = client.commands.has(message.content.split(' ')[0].toLowerCase());
     
-    if (!hasPrefix && !isDirectCommand) return;
+    if (!hasSamkariPrefix && !hasPrefix && !isDirectCommand) return;
 
-    // If user just types "!" show available commands
-    if (message.content.trim() === '!' || message.content.trim() === 'help') {
-        const { EmbedBuilder } = require('discord.js');
-        const { COLORS } = require('./utils/embedBuilder');
-        
-        const commandsEmbed = new EmbedBuilder()
-            .setColor(COLORS.BLURPLE)
-            .setTitle('📋 Available Commands')
-            .setDescription('Type any of these commands:')
-            .addFields(
-                { name: 'help', value: 'Show complete help guide', inline: true },
-                { name: 'create', value: 'Create new roadmap', inline: true },
-                { name: 'addtask', value: 'Add new task', inline: true },
-                { name: 'bulkaddtask', value: 'Add multiple tasks at once', inline: true },
-                { name: 'tasks', value: 'Show tasks with numbers', inline: true },
-                { name: 'done', value: 'Complete task by number', inline: true },
-                { name: 'taskstats', value: 'Task statistics (admin)', inline: true },
-                { name: 'myroadmaps', value: 'Show your available roadmaps', inline: true },
-                { name: 'showroadmap', value: 'Show roadmap details', inline: true },
-                { name: 'clear', value: 'Clear chat messages (admin)', inline: true },
-                { name: 'dm', value: 'Send private message to role (admin)', inline: true },
-                { name: 'deleteroadmap', value: 'Delete roadmap permanently (admin)', inline: true }
-            )
-            .setFooter({ text: 'Type help for detailed explanation or use commands without !' })
-            .setTimestamp();
+    // If user just types "يا سمكري", "!" or "help" show available commands
+    if (message.content.trim().toLowerCase() === 'يا سمكري' || message.content.trim() === '!' || message.content.trim() === 'help') {
+        try {
+            const { EmbedBuilder } = require('discord.js');
             
-        return message.reply({ embeds: [commandsEmbed] }).catch(() => {});
+            const commandList = Array.from(client.commands.keys()).map(cmd => `\`${cmd}\``).join(', ');
+            
+            const embed = new EmbedBuilder()
+                .setColor(0x5865F2)
+                .setTitle('🔧 يا قلب السمكري - الكوماندات اهي')
+                .setDescription(`**الكوماندات المتاحة:**\n${commandList}\n\n**للمساعدة التفصيلية:** \`يا سمكري help\` أو \`help\``)
+                .setTimestamp();
+            
+            await message.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error('Error showing commands:', error);
+        }
+        return;
+    }
+
+    // Parse command content
+    let content = message.content;
+    if (hasSamkariPrefix) {
+        // Remove "يا سمكري " from the beginning
+        content = content.toLowerCase().replace(/^يا سمكري\s*/, '').trim();
+        if (!content) return; // If nothing after "يا سمكري", we already handled it above
+    } else if (hasPrefix) {
+        content = content.slice(1).trim(); // Remove ! prefix
+    } else {
+        content = content.trim(); // Direct command
     }
 
     // Parse command and arguments
-    let content = message.content.trim();
-    if (content.startsWith('!')) {
-        content = content.slice(1);
-    }
     const args = content.split(/ +/);
     const commandName = args.shift().toLowerCase();
 
@@ -181,9 +163,9 @@ client.on('messageCreate', async (message) => {
         
         const availableCommands = Array.from(client.commands.keys()).slice(0, 5);
         const suggestionEmbed = new EmbedBuilder()
-            .setColor(COLORS.YELLOW)
+            .setColor(0xFEE75C)
             .setTitle('❓ Unknown Command')
-            .setDescription(`Command \`${commandName}\` doesn't exist.\n\n**Available commands:**\n${availableCommands.map(cmd => `\`${cmd}\``).join(', ')}\n\nType \`help\` to see the complete command guide.`)
+            .setDescription(`Command \`${commandName}\` doesn't exist.\n\n**Available commands:**\n${availableCommands.map(cmd => `\`${cmd}\``).join(', ')}\n\nType \`يا سمكري\` to see all commands.`)
             .setTimestamp();
         
         return message.reply({ embeds: [suggestionEmbed] }).catch(() => {});
@@ -196,10 +178,9 @@ client.on('messageCreate', async (message) => {
         console.error(`Error executing command ${commandName}:`, error);
         
         const { EmbedBuilder } = require('discord.js');
-        const { COLORS } = require('./utils/embedBuilder');
         
         const errorEmbed = new EmbedBuilder()
-            .setColor(COLORS.RED)
+            .setColor(0xED4245)
             .setTitle('❌ Command Error')
             .setDescription('An error occurred while executing the command. Please try again.')
             .setTimestamp();
