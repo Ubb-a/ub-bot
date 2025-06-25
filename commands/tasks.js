@@ -155,11 +155,45 @@ module.exports = {
                     weekText += '\n';
                 }
                 
-                embed.addFields({
-                    name: `📅 Week ${weekNum} (${totalWeekTasks} tasks)`,
-                    value: weekText || 'No tasks in this week.',
-                    inline: false
-                });
+                // Check if weekText exceeds Discord's 1024 character limit
+                if (weekText.length > 1024) {
+                    // Split into multiple fields
+                    const chunks = [];
+                    let currentChunk = '';
+                    const lines = weekText.split('\n');
+                    
+                    for (const line of lines) {
+                        if ((currentChunk + line + '\n').length > 1024) {
+                            if (currentChunk) chunks.push(currentChunk.trim());
+                            currentChunk = line + '\n';
+                        } else {
+                            currentChunk += line + '\n';
+                        }
+                    }
+                    if (currentChunk) chunks.push(currentChunk.trim());
+                    
+                    // Add first chunk with week name
+                    embed.addFields({
+                        name: `📅 Week ${weekNum} (${totalWeekTasks} tasks)`,
+                        value: chunks[0] || 'No tasks in this week.',
+                        inline: false
+                    });
+                    
+                    // Add remaining chunks
+                    for (let i = 1; i < chunks.length; i++) {
+                        embed.addFields({
+                            name: `📅 Week ${weekNum} (continued)`,
+                            value: chunks[i],
+                            inline: false
+                        });
+                    }
+                } else {
+                    embed.addFields({
+                        name: `📅 Week ${weekNum} (${totalWeekTasks} tasks)`,
+                        value: weekText || 'No tasks in this week.',
+                        inline: false
+                    });
+                }
             }
 
             if (sortedWeeks.length > 10) {
