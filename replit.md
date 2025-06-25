@@ -133,6 +133,7 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - All error messages and responses now in Egyptian Arabic
     - Removed all instances of "خريطة" and replaced with "رود ماب"
     - Added poll command for creating interactive polls with multiple options
+    - Added vote command for simple yes/no voting with ✅/❌ reactions
   - **ENHANCED**: Added admin communication and management tools
     - Added dm command for sending private messages to all users with specific role
     - Added deleteroadmap command for permanent roadmap deletion with confirmation
