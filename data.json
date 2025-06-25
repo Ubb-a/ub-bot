@@ -15,7 +15,10 @@
           "title": "Getting Started",
           "description": "Welcome to your new roadmap! Add tasks using the task management commands.",
           "status": "pending",
-          "createdAt": "2025-06-25T00:21:05.019Z"
+          "createdAt": "2025-06-25T00:21:05.019Z",
+          "emoji": "📝",
+          "completedBy": [],
+          "hiddenBy": []
         }
       ]
     },
@@ -34,7 +37,10 @@
           "title": "البداية",
           "description": "مرحباً بك في خريطة الطريق الجديدة! يمكنك إضافة المهام باستخدام أوامر إدارة المهام.",
           "status": "pending",
-          "createdAt": "2025-06-25T00:30:13.247Z"
+          "createdAt": "2025-06-25T00:30:13.247Z",
+          "emoji": "📝",
+          "completedBy": [],
+          "hiddenBy": []
         },
         {
           "id": 2,
@@ -45,7 +51,9 @@
           "createdBy": "550049617564270642",
           "completedBy": [],
           "messageId": "1387233605176131645",
-          "channelId": "1353795780925984810"
+          "channelId": "1353795780925984810",
+          "emoji": "📚",
+          "hiddenBy": []
         },
         {
           "id": 3,
@@ -56,11 +64,13 @@
           "createdBy": "550049617564270642",
           "completedBy": [],
           "messageId": "1387233748692504617",
-          "channelId": "1353795780925984810"
+          "channelId": "1353795780925984810",
+          "emoji": "💻",
+          "hiddenBy": []
         }
       ]
     }
   },
-  "lastUpdated": "2025-06-25T00:51:40.201Z",
+  "lastUpdated": "2025-06-25T01:01:47.514Z",
   "version": "1.0.0"
 }

@@ -97,8 +97,21 @@ module.exports = {
                 const completedCount = task.completedBy ? task.completedBy.length : 0;
                 const hiddenCount = task.hiddenBy ? task.hiddenBy.length : 0;
                 
+                // Show completed users
+                let completedUsers = '';
+                if (task.completedBy && task.completedBy.length > 0) {
+                    const userNames = task.completedBy.map(userId => {
+                        const member = message.guild.members.cache.get(userId);
+                        return member ? member.displayName : `User ${userId}`;
+                    }).slice(0, 3); // Show max 3 names
+                    completedUsers = userNames.join(', ');
+                    if (task.completedBy.length > 3) completedUsers += ` +${task.completedBy.length - 3}`;
+                }
+                
                 taskDetails += `${taskEmoji} **${task.title}**\n`;
-                taskDetails += `   ✅ مكتملة: ${completedCount} | ❌ مخفية: ${hiddenCount}\n\n`;
+                taskDetails += `   ✅ مكتملة: ${completedCount}`;
+                if (completedUsers) taskDetails += ` (${completedUsers})`;
+                taskDetails += `\n   ❌ مخفية: ${hiddenCount}\n\n`;
             }
 
             if (taskDetails) {
