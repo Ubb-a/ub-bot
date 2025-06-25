@@ -154,9 +154,52 @@
       "roleName": "Back End",
       "createdBy": "550049617564270642",
       "createdAt": "2025-06-25T15:59:20.527Z",
-      "tasks": []
+      "tasks": [
+        {
+          "id": 1,
+          "title": "task 1",
+          "description": "task 1",
+          "status": "pending",
+          "createdBy": "550049617564270642",
+          "weekNumber": 1,
+          "topic": "inter",
+          "links": [
+            "https://google.com/",
+            "https://google.com/"
+          ],
+          "createdAt": "2025-06-25T16:40:28.777Z",
+          "completedBy": [],
+          "hiddenBy": []
+        },
+        {
+          "id": 2,
+          "title": "task 2 task 1",
+          "description": "task 2 task 1",
+          "status": "pending",
+          "createdBy": "550049617564270642",
+          "weekNumber": 1,
+          "topic": "node.js",
+          "links": [],
+          "createdAt": "2025-06-25T16:40:28.777Z",
+          "completedBy": [],
+          "hiddenBy": []
+        },
+        {
+          "id": 3,
+          "title": "task 2",
+          "description": "task 2",
+          "status": "pending",
+          "createdBy": "550049617564270642",
+          "weekNumber": 1,
+          "topic": "node.js",
+          "links": [],
+          "createdAt": "2025-06-25T16:40:28.777Z",
+          "completedBy": [],
+          "hiddenBy": []
+        }
+      ]
     }
   },
-  "lastUpdated": "2025-06-25T16:35:19.908Z",
+  "lastUpdated": "2025-06-25T16:40:28.777Z",
   "version": "1.0.0"
 }
