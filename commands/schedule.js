@@ -38,7 +38,7 @@ module.exports = {
 
             const subCommand = args[0].toLowerCase();
 
-            // Handle list command
+            // Handle list command  
             if (subCommand === 'list') {
                 return await this.listScheduledTasks(message);
             }

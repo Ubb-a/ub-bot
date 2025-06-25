@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'addtask',
     description: 'Add a new task to a roadmap',
-    usage: 'addtask <roadmap_name> <task_title>',
+    usage: 'addtask <roadmap_name> | <task_title> | <task_description> | <week_number>',
     
     async execute(message, args) {
         try {
@@ -14,40 +14,52 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ ممنوع الوصول')
-                    .setDescription('تحتاج صلاحية "إدارة الأدوار" لإضافة المهام.')
+                    .setDescription('محتاج صلاحية "إدارة الأدوار" عشان تضيف مهام.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Parse arguments
-            if (args.length < 2) {
+            // Check if arguments are provided
+            if (args.length === 0) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(COLORS.RED)
+                    .setTitle('❌ معلومات ناقصة')
+                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev | تعلم HTML | أساسيات HTML | 1\`\n\n**ملاحظة:** رقم الأسبوع اختياري، لو مكتبتوش هيتحط في الأسبوع الأول.`)
+                    .setTimestamp();
+                return message.reply({ embeds: [errorEmbed] });
+            }
+
+            const fullArgs = args.join(' ');
+            const parts = fullArgs.split(' | ');
+
+            if (parts.length < 3 || parts.length > 4) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ استخدام خاطئ')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!addtask تطوير-المواقع تعلم HTML | تعلم أساسيات HTML وCSS\``)
+                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev | تعلم HTML | أساسيات HTML | 2\`\n\n**ملاحظة:** رقم الأسبوع اختياري`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Parse roadmap name and task title
-            const inputParts = args.join(' ').split(' ');
-            if (inputParts.length < 2) {
+            const [roadmapName, taskTitle, taskDescription, weekStr] = parts.map(part => part.trim());
+            const weekNumber = weekStr ? parseInt(weekStr) : 1;
+
+            // Validate inputs
+            if (!roadmapName || !taskTitle || !taskDescription) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ Wrong Format')
-                    .setDescription('**Usage:** `addtask roadmap_name task_title`\n**Example:** `addtask backend Learn JavaScript`')
+                    .setTitle('❌ بيانات ناقصة')
+                    .setDescription('تأكد من ملء جميع المعلومات المطلوبة.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            const roadmapName = inputParts[0];
-            const taskTitle = inputParts.slice(1).join(' ');
-
-            if (!roadmapName || !taskTitle) {
+            // Validate week number
+            if (isNaN(weekNumber) || weekNumber < 1 || weekNumber > 52) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ Missing Data')
-                    .setDescription('Make sure to write the roadmap name and task title.')
+                    .setTitle('❌ رقم أسبوع غير صحيح')
+                    .setDescription('رقم الأسبوع لازم يكون رقم من 1 لـ 52.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -59,8 +71,8 @@ module.exports = {
             if (!roadmap) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ Roadmap Not Found')
-                    .setDescription(`Roadmap "${roadmapName}" doesn't exist in this server.`)
+                    .setTitle('❌ الرود ماب مش موجودة')
+                    .setDescription(`مفيش رود ماب بالاسم "${roadmapName}" في السيرفر ده.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -70,8 +82,8 @@ module.exports = {
                 const role = message.guild.roles.cache.get(roadmap.roleId);
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ Access Denied')
-                    .setDescription(`You need the ${role ? role.toString() : 'required'} role to edit this roadmap.`)
+                    .setTitle('❌ ممنوع الوصول')
+                    .setDescription(`محتاج رتبة ${role ? role.toString() : 'مطلوبة'} عشان تعدل الرود ماب دي.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -97,9 +109,12 @@ module.exports = {
             const newTask = {
                 id: newTaskId,
                 title: taskTitle,
+                description: taskDescription,
                 emoji: taskEmoji,
                 status: 'pending',
                 createdBy: message.author.id,
+                weekNumber: weekNumber,
+                createdAt: new Date().toISOString(),
                 completedBy: [], // Array to track who completed it
                 hiddenBy: [] // Array to track who hid it
             };
@@ -111,18 +126,18 @@ module.exports = {
             // Create task embed
             const taskEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
-                .setTitle('✅ Task Added Successfully!')
-                .setDescription(`**Roadmap:** ${roadmap.name}\n**Task:** ${taskTitle}`)
+                .setTitle('✅ تم إضافة المهمة بنجاح!')
+                .setDescription(`**الرود ماب:** ${roadmap.name}\n**المهمة:** ${taskTitle}\n**الوصف:** ${taskDescription}\n**الأسبوع:** ${weekNumber}\n**الرقم:** ${newTaskId}`)
                 .addFields([
                     {
-                        name: '💡 How to Use',
-                        value: `Use \`tasks ${roadmap.name.toLowerCase()}\` to view tasks\nUse \`done task_number\` to complete tasks`,
+                        name: '💡 طريقة الاستعمال',
+                        value: `استعمل \`tasks ${roadmap.name.toLowerCase()}\` عشان تشوف المهام\nاستعمل \`done رقم_المهمة\` عشان تخلص المهمة`,
                         inline: false
                     }
                 ])
                 .setTimestamp()
                 .setFooter({
-                    text: `Total tasks: ${roadmap.tasks.length}`,
+                    text: `إجمالي المهام: ${roadmap.tasks.length}`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 

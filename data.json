@@ -13,7 +13,8 @@
         {
           "id": 1,
           "title": "Getting Started",
-          "description": "Welcome to your new roadmap! Add tasks using the task management commands.",
+          "description": "مرحباً بك في الرود ماب الجديدة! ضيف المهام باستخدام أوامر إدارة المهام.",
+          "weekNumber": 1,
           "status": "pending",
           "createdAt": "2025-06-25T00:21:05.019Z",
           "emoji": "📝",
@@ -39,6 +40,7 @@
           "status": "pending",
           "createdAt": "2025-06-25T00:30:13.247Z",
           "emoji": "📝",
+          "weekNumber": 1,
           "completedBy": [
             "550049617564270642"
           ],

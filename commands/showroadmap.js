@@ -106,44 +106,62 @@ module.exports = {
             inline: false
         });
         
-        // Add tasks section
+        // Group tasks by week
+        const tasksByWeek = {};
+        tasks.forEach(task => {
+            const week = task.weekNumber || 1;
+            if (!tasksByWeek[week]) {
+                tasksByWeek[week] = [];
+            }
+            tasksByWeek[week].push(task);
+        });
+
+        // Add tasks section organized by weeks
         if (tasks.length > 0) {
-            let tasksText = '';
-            const maxTasksToShow = 10; // Limit to prevent embed overflow
+            const sortedWeeks = Object.keys(tasksByWeek).sort((a, b) => parseInt(a) - parseInt(b));
             
-            tasks.slice(0, maxTasksToShow).forEach((task, index) => {
-                let statusEmoji = '';
-                switch (task.status) {
-                    case 'completed':
-                        statusEmoji = '✅';
-                        break;
-                    case 'in-progress':
-                        statusEmoji = '🔄';
-                        break;
-                    default:
-                        statusEmoji = '⏳';
-                }
+            for (const weekNum of sortedWeeks.slice(0, 5)) { // Show max 5 weeks to prevent overflow
+                const weekTasks = tasksByWeek[weekNum];
+                let weekText = '';
                 
-                tasksText += `${statusEmoji} **${task.title}**\n`;
-                if (task.description) {
-                    tasksText += `   ${task.description.substring(0, 80)}${task.description.length > 80 ? '...' : ''}\n`;
-                }
-                tasksText += '\n';
-            });
-            
-            if (tasks.length > maxTasksToShow) {
-                tasksText += `*... و ${tasks.length - maxTasksToShow} مهام أخرى*`;
+                weekTasks.forEach((task, index) => {
+                    let statusEmoji = '';
+                    switch (task.status) {
+                        case 'completed':
+                            statusEmoji = '✅';
+                            break;
+                        case 'in-progress':
+                            statusEmoji = '🔄';
+                            break;
+                        default:
+                            statusEmoji = '⏳';
+                    }
+                    
+                    weekText += `${statusEmoji} **${task.id}.** ${task.title}\n`;
+                    if (task.description) {
+                        weekText += `   ${task.description.substring(0, 60)}${task.description.length > 60 ? '...' : ''}\n`;
+                    }
+                    weekText += '\n';
+                });
+                
+                embed.addFields({
+                    name: `📅 الأسبوع ${weekNum} (${weekTasks.length} مهمة)`,
+                    value: weekText || 'مفيش مهام في الأسبوع ده.',
+                    inline: false
+                });
             }
             
-            embed.addFields({
-                name: `📋 المهام (${Math.min(tasks.length, maxTasksToShow)}/${tasks.length})`,
-                value: tasksText || 'لا توجد مهام متاحة.',
-                inline: false
-            });
+            if (sortedWeeks.length > 5) {
+                embed.addFields({
+                    name: '📝 ملاحظة',
+                    value: `... و ${sortedWeeks.length - 5} أسابيع أخرى. استعمل \`tasks ${roadmap.name}\` لشوف كل المهام.`,
+                    inline: false
+                });
+            }
         } else {
             embed.addFields({
                 name: '📋 المهام',
-                value: 'لم يتم إضافة أي مهام لهذه الخريطة بعد.',
+                value: 'مفيش مهام متضافة للرود ماب دي لسه.',
                 inline: false
             });
         }
