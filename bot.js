@@ -131,23 +131,23 @@ client.on('messageCreate', async (message) => {
             
             const embed = new EmbedBuilder()
                 .setColor(0x5865F2)
-                .setTitle('🔧 يا قلب السمكري - الكوماندات اهي')
-                .setDescription('**الكوماندات المتاحة:**')
+                .setTitle('🔧 يا قلب السمكري - الأوامر اهي')
+                .setDescription('**الأوامر الموجودة:**')
                 .addFields(
-                    { name: '📋 help', value: 'دليل المساعدة الكامل مع شرح تفصيلي لكل كوماند', inline: false },
-                    { name: '🗺️ create', value: 'إنشاء خريطة طريق جديدة للتعلم أو المشاريع', inline: false },
-                    { name: '✅ addtask', value: 'إضافة مهمة جديدة لخريطة الطريق', inline: false },
+                    { name: '📋 help', value: 'دليل المساعدة الكامل مع شرح كل أمر بالتفصيل', inline: false },
+                    { name: '🗺️ create', value: 'عمل رود ماب جديدة للتعلم أو الشغل', inline: false },
+                    { name: '✅ addtask', value: 'زود مهمة جديدة للرود ماب', inline: false },
                     { name: '📦 bulkaddtask', value: 'إضافة عدة مهام مرة واحدة (منفصلة بـ ,)', inline: false },
-                    { name: '📝 tasks', value: 'عرض جميع المهام مع الأرقام للمتابعة', inline: false },
-                    { name: '✔️ done', value: 'تسجيل إتمام مهمة برقمها (مثال: done 2)', inline: false },
-                    { name: '📊 taskstats', value: 'إحصائيات المهام والمتابعة (للإدارة)', inline: false },
-                    { name: '🗂️ myroadmaps', value: 'عرض خرائط الطريق المتاحة لك', inline: false },
-                    { name: '👁️ showroadmap', value: 'عرض تفاصيل خريطة طريق معينة', inline: false },
-                    { name: '🧹 clear', value: 'مسح الرسائل من المحادثة (للإدارة)', inline: false },
-                    { name: '💬 dm', value: 'إرسال رسالة خاصة لأصحاب رتبة معينة (للإدارة)', inline: false },
-                    { name: '🗑️ deleteroadmap', value: 'حذف خريطة طريق نهائياً (للإدارة)', inline: false }
+                    { name: '📝 tasks', value: 'شوف كل المهام بالأرقام عشان تتابع', inline: false },
+                    { name: '✔️ done', value: 'خلص مهمة برقمها (زي: done 2)', inline: false },
+                    { name: '📊 taskstats', value: 'إحصائيات المهام والمتابعة (للأدمن)', inline: false },
+                    { name: '🗂️ myroadmaps', value: 'شوف الرود ماب الموجودة عندك', inline: false },
+                    { name: '👁️ showroadmap', value: 'شوف تفاصيل رود ماب معينة', inline: false },
+                    { name: '🧹 clear', value: 'امسح الرسايل من الشات (للأدمن)', inline: false },
+                    { name: '💬 dm', value: 'ابعت رسالة خاصة لناس رتبة معينة (للأدمن)', inline: false },
+                    { name: '🗑️ deleteroadmap', value: 'امسح رود ماب خالص (للأدمن)', inline: false }
                 )
-                .setFooter({ text: 'استخدم: يا سمكري [اسم الكوماند] أو مباشرة [اسم الكوماند]' })
+                .setFooter({ text: 'استعمل: يا سمكري [اسم الأمر] أو على طول [اسم الأمر]' })
                 .setTimestamp();
             
             await message.reply({ embeds: [embed] });
@@ -182,8 +182,8 @@ client.on('messageCreate', async (message) => {
         const availableCommands = Array.from(client.commands.keys()).slice(0, 5);
         const suggestionEmbed = new EmbedBuilder()
             .setColor(0xFEE75C)
-            .setTitle('❓ Unknown Command')
-            .setDescription(`Command \`${commandName}\` doesn't exist.\n\n**Available commands:**\n${availableCommands.map(cmd => `\`${cmd}\``).join(', ')}\n\nType \`يا سمكري\` to see all commands.`)
+            .setTitle('❓ أمر مش معروف')
+            .setDescription(`الأمر \`${commandName}\` مش موجود.\n\n**الأوامر الموجودة:**\n${availableCommands.map(cmd => `\`${cmd}\``).join(', ')}\n\nاكتب \`يا سمكري\` عشان تشوف كل الأوامر.`)
             .setTimestamp();
         
         return message.reply({ embeds: [suggestionEmbed] }).catch(() => {});
@@ -199,8 +199,8 @@ client.on('messageCreate', async (message) => {
         
         const errorEmbed = new EmbedBuilder()
             .setColor(0xED4245)
-            .setTitle('❌ Command Error')
-            .setDescription('An error occurred while executing the command. Please try again.')
+            .setTitle('❌ خطأ في الأمر')
+            .setDescription('حصل خطأ وأنت بتشغل الأمر. جرب تاني.')
             .setTimestamp();
         
         message.reply({ embeds: [errorEmbed] }).catch(() => {});

@@ -125,6 +125,12 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Added "يا سمكري" as alternative command prefix alongside "!"
     - Users can now use "يا سمكري help" or just "يا سمكري" to see commands
     - All commands work with both prefixes: "!help" or "يا سمكري help"
+  - **UPDATED**: Full Egyptian Arabic conversion (June 25, 2025)
+    - Converted all Arabic text to Egyptian dialect throughout the system
+    - Changed "كوماندات" to "أوامر" (commands to orders)
+    - Changed "خرائط الطريق" to "رود ماب" (roadmaps)
+    - Updated help command with Egyptian Arabic descriptions
+    - All error messages and responses now in Egyptian Arabic
   - **ENHANCED**: Added admin communication and management tools
     - Added dm command for sending private messages to all users with specific role
     - Added deleteroadmap command for permanent roadmap deletion with confirmation
