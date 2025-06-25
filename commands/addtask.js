@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'addtask',
     description: 'Add a new task to a roadmap',
-    usage: '!addtask <roadmap_name> <task_title> | <task_description>',
+    usage: 'addtask <roadmap_name> <task_title>',
     
     async execute(message, args) {
         try {
@@ -35,7 +35,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Wrong Format')
-                    .setDescription('**Usage:** `!addtask roadmap_name task_title`\n**Example:** `!addtask backend Learn JavaScript`')
+                    .setDescription('**Usage:** `addtask roadmap_name task_title`\n**Example:** `addtask backend Learn JavaScript`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -116,7 +116,7 @@ module.exports = {
                 .addFields([
                     {
                         name: '💡 How to Use',
-                        value: `Use \`!tasks ${roadmap.name.toLowerCase()}\` to view tasks\nUse \`!done task_number\` to complete tasks`,
+                        value: `Use \`tasks ${roadmap.name.toLowerCase()}\` to view tasks\nUse \`done task_number\` to complete tasks`,
                         inline: false
                     }
                 ])

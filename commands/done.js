@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap, getRoadmaps } = require('../utils/dataManager')
 module.exports = {
     name: 'done',
     description: 'Mark a task as completed by its number',
-    usage: '!done <task_number> [roadmap_name]',
+    usage: 'done <task_number> [roadmap_name]',
     
     async execute(message, args) {
         try {
@@ -13,7 +13,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Task Number Missing')
-                    .setDescription(`**Usage:** ${this.usage}\n**Example:** \`!done 2\` or \`!done 2 backend\``)
+                    .setDescription(`**Usage:** ${this.usage}\n**Example:** \`done 2\` or \`done 2 backend\``)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -78,7 +78,7 @@ module.exports = {
                     const errorEmbed = new EmbedBuilder()
                         .setColor(COLORS.YELLOW)
                         .setTitle('🤔 Multiple Roadmaps Available')
-                        .setDescription(`You have access to multiple roadmaps: ${roadmapNames}\n\nPlease specify the roadmap name:\n\`!done ${taskNumber} roadmap_name\``)
+                        .setDescription(`You have access to multiple roadmaps: ${roadmapNames}\n\nPlease specify the roadmap name:\n\`done ${taskNumber} roadmap_name\``)
                         .setTimestamp();
                     return message.reply({ embeds: [errorEmbed] });
                 }

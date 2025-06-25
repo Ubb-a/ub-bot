@@ -48,11 +48,14 @@ client.on('messageCreate', async (message) => {
     // Ignore bot messages
     if (message.author.bot) return;
     
-    // Check if message starts with !
-    if (!message.content.startsWith('!')) return;
+    // Check if message starts with ! or is a direct command
+    const hasPrefix = message.content.startsWith('!');
+    const isDirectCommand = client.commands.has(message.content.split(' ')[0].toLowerCase());
+    
+    if (!hasPrefix && !isDirectCommand) return;
 
     // If user just types "!" show available commands
-    if (message.content.trim() === '!') {
+    if (message.content.trim() === '!' || message.content.trim() === 'help') {
         const { EmbedBuilder } = require('discord.js');
         const { COLORS } = require('./utils/embedBuilder');
         
@@ -61,23 +64,28 @@ client.on('messageCreate', async (message) => {
             .setTitle('📋 Available Commands')
             .setDescription('Type any of these commands:')
             .addFields(
-                { name: '!help', value: 'Show complete help guide', inline: true },
-                { name: '!create', value: 'Create new roadmap', inline: true },
-                { name: '!addtask', value: 'Add new task', inline: true },
-                { name: '!tasks', value: 'Show tasks with numbers', inline: true },
-                { name: '!done', value: 'Complete task by number', inline: true },
-                { name: '!taskstats', value: 'Task statistics (admin)', inline: true },
-                { name: '!myroadmaps', value: 'Show your available roadmaps', inline: true },
-                { name: '!showroadmap', value: 'Show roadmap details', inline: true }
+                { name: 'help', value: 'Show complete help guide', inline: true },
+                { name: 'create', value: 'Create new roadmap', inline: true },
+                { name: 'addtask', value: 'Add new task', inline: true },
+                { name: 'tasks', value: 'Show tasks with numbers', inline: true },
+                { name: 'done', value: 'Complete task by number', inline: true },
+                { name: 'taskstats', value: 'Task statistics (admin)', inline: true },
+                { name: 'myroadmaps', value: 'Show your available roadmaps', inline: true },
+                { name: 'showroadmap', value: 'Show roadmap details', inline: true },
+                { name: 'clear', value: 'Clear chat messages (admin)', inline: true }
             )
-            .setFooter({ text: 'Type !help for detailed explanation' })
+            .setFooter({ text: 'Type help for detailed explanation or use commands without !' })
             .setTimestamp();
             
         return message.reply({ embeds: [commandsEmbed] }).catch(() => {});
     }
 
     // Parse command and arguments
-    const args = message.content.slice(1).trim().split(/ +/);
+    let content = message.content.trim();
+    if (content.startsWith('!')) {
+        content = content.slice(1);
+    }
+    const args = content.split(/ +/);
     const commandName = args.shift().toLowerCase();
 
     // Get command from collection
@@ -92,7 +100,7 @@ client.on('messageCreate', async (message) => {
         const suggestionEmbed = new EmbedBuilder()
             .setColor(COLORS.YELLOW)
             .setTitle('❓ Unknown Command')
-            .setDescription(`Command \`!${commandName}\` doesn't exist.\n\n**Available commands:**\n${availableCommands.map(cmd => `\`!${cmd}\``).join(', ')}\n\nType \`!help\` to see the complete command guide.`)
+            .setDescription(`Command \`${commandName}\` doesn't exist.\n\n**Available commands:**\n${availableCommands.map(cmd => `\`${cmd}\``).join(', ')}\n\nType \`help\` to see the complete command guide.`)
             .setTimestamp();
         
         return message.reply({ embeds: [suggestionEmbed] }).catch(() => {});

@@ -3,73 +3,82 @@ const { COLORS } = require('../utils/embedBuilder');
 
 module.exports = {
     name: 'help',
-    description: 'Display help information and available commands',
-    usage: '!help',
+    description: 'Show detailed help information',
+    usage: 'help',
     
     async execute(message, args) {
-        const helpEmbed = new EmbedBuilder()
+        try {
+            const helpEmbed = new EmbedBuilder()
             .setColor(COLORS.BLURPLE)
-            .setTitle('🤖 بوت إدارة خرائط الطريق')
-            .setDescription('إدارة خرائط الطريق القائمة على الأدوار مع تتبع المهام!')
+            .setTitle('🤖 Bot Guide - Roadmaps')
+            .setDescription('Hello! I\'m a roadmap management bot. I can help you create and manage custom learning roadmaps for your server members.')
             .addFields(
                 {
-                    name: '📝 !create <اسم_الخريطة> role:@<الرول>',
-                    value: 'إنشاء خريطة طريق جديدة مع صلاحيات محددة\n**مثال:** `!create تطوير-المواقع role:@Developer`',
+                    name: '🗺️ create <roadmap_name> <@role>',
+                    value: 'Create a new roadmap linked to a specific role\n**Example:** `create web-dev @Developer`',
                     inline: false
                 },
                 {
-                    name: '📋 !myroadmaps',
-                    value: 'عرض جميع خرائط الطريق المتاحة لك حسب أدوارك\nيظهر التقدم والإحصائيات لكل خريطة',
+                    name: '📋 myroadmaps',
+                    value: 'Show all roadmaps you have access to',
                     inline: false
                 },
                 {
-                    name: '🗺️ !showroadmap <اسم_الخريطة>',
-                    value: 'عرض تفاصيل مفصلة عن خريطة طريق معينة\n**مثال:** `!showroadmap تطوير-المواقع`',
+                    name: '🔍 showroadmap <roadmap_name>',
+                    value: 'Show details of a specific roadmap with progress bar\n**Example:** `showroadmap web-dev`',
                     inline: false
                 },
                 {
-                    name: '❓ !help',
-                    value: 'عرض هذه القائمة من الأوامر والمساعدة',
+                    name: '❓ help',
+                    value: 'Show this command list and help',
                     inline: false
                 },
                 {
-                    name: '📝 !addtask <خريطة> <عنوان_المهمة>',
-                    value: 'إضافة مهمة جديدة لخريطة طريق\n**مثال:** `!addtask back_end تعلم JavaScript`',
+                    name: '📝 addtask <roadmap> <task_title>',
+                    value: 'Add a new task to a roadmap\n**Example:** `addtask backend Learn JavaScript`',
                     inline: false
                 },
                 {
-                    name: '📋 !tasks <اسم_الخريطة>',
-                    value: 'عرض جميع المهام مرقمة من 1 إلى N\n**مثال:** `!tasks back_end`',
+                    name: '📋 tasks [roadmap_name]',
+                    value: 'Show all tasks numbered from 1 to N. If you have one roadmap, no need to specify name\n**Example:** `tasks` or `tasks backend`',
                     inline: false
                 },
                 {
-                    name: '✅ !done <رقم_المهمة> [اسم_الخريطة]',
-                    value: 'تمييز مهمة كمكتملة بالرقم\n**مثال:** `!done 2` أو `!done 3 back_end`',
+                    name: '✅ done <task_number> [roadmap_name]',
+                    value: 'Mark a task as completed by number\n**Example:** `done 2` or `done 3 backend`',
                     inline: false
                 },
                 {
-                    name: '📊 !taskstats <اسم_الخريطة>',
-                    value: 'عرض إحصائيات تفاعل الأعضاء مع المهام (للإداريين فقط)\n**يعرض:** من أنجز أي مهمة ومن أخفى أي مهمة',
+                    name: '📊 taskstats <roadmap_name>',
+                    value: 'Show member task interaction statistics (admin only)\n**Shows:** who completed which tasks',
+                    inline: false
+                },
+                {
+                    name: '🧹 clear [number]',
+                    value: 'Clear chat messages (admin only)\n**Example:** `clear 10` or `clear` (deletes last 5)',
                     inline: false
                 }
             )
             .addFields({
-                name: '💡 نصائح مهمة',
-                value: '• تحتاج صلاحية "إدارة الأدوار" لإنشاء خرائط طريق جديدة\n• كل خريطة طريق مرتبطة برول معين\n• يمكن للأعضاء الذين لديهم الرول المطلوب فقط الوصول للخريطة\n• استخدم أسماء الخرائط الدقيقة (غير حساسة لحالة الأحرف)\n• يتم حفظ البيانات تلقائياً لكل سيرفر',
+                name: '💡 Important Tips',
+                value: '• You need "Manage Roles" permission to create new roadmaps\n• Each roadmap is linked to a specific role\n• Only members with the required role can access the roadmap\n• Use exact roadmap names (case insensitive)\n• Data is automatically saved per server\n• Commands work without the ! prefix',
                 inline: false
             })
             .addFields({
-                name: '🚀 كيفية البدء',
-                value: '1. استخدم `!create` لإنشاء خريطة طريق جديدة\n2. استخدم `!addtask` لإضافة مهام للخريطة\n3. استخدم `!tasks` لعرض المهام مرقمة\n4. استخدم `!done رقم_المهمة` لإنهاء المهام\n5. استخدم `!taskstats` لمراقبة تقدم الأعضاء (للإداريين)\n6. استخدم `!showroadmap` لمراجعة تفاصيل خريطة معينة',
+                name: '🚀 Getting Started',
+                value: '1. Use `create` to create a new roadmap\n2. Use `addtask` to add tasks to the roadmap\n3. Use `tasks` to view numbered tasks\n4. Use `done task_number` to complete tasks\n5. Use `taskstats` to monitor member progress (admin)\n6. Use `showroadmap` to review roadmap details',
                 inline: false
             })
             .setTimestamp()
             .setFooter({
-                text: 'تم التطوير باستخدام Discord.js v14',
+                text: 'Built with Discord.js v14',
                 iconURL: message.guild.iconURL({ dynamic: true })
             })
             .setThumbnail(message.client.user.displayAvatarURL({ dynamic: true }));
 
         return message.reply({ embeds: [helpEmbed] }).catch(console.error);
+        } catch (err) {
+            console.error('Error in help command:', err);
+        }
     }
 };

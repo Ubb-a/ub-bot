@@ -5,7 +5,7 @@ const { getRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'tasks',
     description: 'Show all tasks in a roadmap with interactive buttons',
-    usage: '!tasks <roadmap_name>',
+    usage: 'tasks [roadmap_name]',
     
     async execute(message, args) {
         try {
@@ -45,7 +45,7 @@ module.exports = {
                     const errorEmbed = new EmbedBuilder()
                         .setColor(COLORS.YELLOW)
                         .setTitle('🤔 Multiple Roadmaps Available')
-                        .setDescription(`You have access to multiple roadmaps: ${roadmapNames}\n\nPlease specify which one:\n\`!tasks roadmap_name\``)
+                        .setDescription(`You have access to multiple roadmaps: ${roadmapNames}\n\nPlease specify which one:\n\`tasks roadmap_name\``)
                         .setTimestamp();
                     return message.reply({ embeds: [errorEmbed] });
                 }
@@ -101,7 +101,7 @@ module.exports = {
                 .setDescription(`Total visible tasks: ${visibleTasks.length}`)
                 .setTimestamp()
                 .setFooter({
-                    text: `${message.guild.name} | Use !done task_number`,
+                    text: `${message.guild.name} | Use done task_number`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 
@@ -130,7 +130,7 @@ module.exports = {
             // Add instructions for completing tasks
             embed.addFields({
                 name: '💡 How to Use',
-                value: `To mark a task as completed, type: \`!done task_number\`\nExample: \`!done 2\` to complete task number 2`,
+                value: `To mark a task as completed, type: \`done task_number\`\nExample: \`done 2\` to complete task number 2`,
                 inline: false
             });
 

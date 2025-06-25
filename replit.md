@@ -111,10 +111,15 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Admin dashboard showing who completed/hid which specific tasks
   - **UPDATED**: Complete system overhaul from emoji to number-based
     - Replaced complex emoji system with simple numbered tasks (1, 2, 3...)
-    - Added new !done command for completing tasks by number
+    - Added new done command for completing tasks by number
     - Removed emoji reaction handler completely
     - Tasks now display clearly numbered for easy identification
-    - Users can complete tasks with simple commands like !done 2
+    - Users can complete tasks with simple commands like done 2
+  - **FINALIZED**: Full English conversion and command prefix removal
+    - Converted all Arabic text to English throughout the entire system
+    - Removed ! prefix requirement - commands work with or without !
+    - Added clear command for chat management (admin only)
+    - Smart role detection for automatic roadmap access
   - Added JSON data persistence with backup functionality
   - Configured Express web server for monitoring and API endpoints
   - Successfully connected Discord bot with proper intents
