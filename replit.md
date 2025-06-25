@@ -186,6 +186,8 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - New format: `bulkaddtask roadmap week T:topic task1 link:url1|url2 , task2 T:newtopic task3`
     - Topics persist across tasks until new topic is defined
     - Supports optional links for each task using pipe separation
+    - Fixed parsing logic to properly separate task titles from links
+    - Improved topic handling to prevent mixing between different topics
 
 ## Changelog
 

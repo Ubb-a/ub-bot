@@ -83,7 +83,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ No Valid Tasks Found')
-                    .setDescription('Please provide tasks in the correct format: T:<topic> task1 link:url1,url2 task2')
+                    .setDescription('Please provide tasks in the correct format: T:<topic> task1 link:url1|url2 , task2')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -202,35 +202,39 @@ module.exports = {
         for (const taskPart of taskParts) {
             if (!taskPart) continue;
             
-            const tokens = taskPart.split(' ');
-            let taskTitle = '';
+            let workingPart = taskPart;
             let links = [];
             
-            for (let i = 0; i < tokens.length; i++) {
-                const token = tokens[i];
-                
-                // Check if this is a topic definition
-                if (token.startsWith('T:')) {
-                    currentTopic = token.substring(2);
-                    continue;
-                }
-                
-                // Check if this is a link definition
-                if (token.startsWith('link:')) {
-                    const linkData = token.substring(5); // Remove 'link:'
-                    links = linkData.split('|').map(link => link.trim()).filter(link => link.length > 0);
-                    continue;
-                }
-                
-                // This is part of the task title
-                if (taskTitle) taskTitle += ' ';
-                taskTitle += token;
+            // Check for topic definition first
+            const topicMatch = workingPart.match(/T:([^\s]+)/);
+            if (topicMatch) {
+                currentTopic = topicMatch[1];
+                workingPart = workingPart.replace(/T:[^\s]+\s*/, '').trim();
             }
             
+            // Extract links if present - find 'link:' and capture everything until end or next word
+            const linkIndex = workingPart.indexOf('link:');
+            if (linkIndex !== -1) {
+                // Get the part before 'link:' as task title
+                const beforeLink = workingPart.substring(0, linkIndex).trim();
+                
+                // Get the part after 'link:' as links
+                const afterLink = workingPart.substring(linkIndex + 5).trim();
+                
+                // Split links by pipe and clean them
+                links = afterLink.split('|').map(link => link.trim()).filter(link => link.length > 0);
+                
+                // Use the part before 'link:' as task title
+                workingPart = beforeLink;
+            }
+            
+            // What's left should be the task title
+            const taskTitle = workingPart.trim();
+            
             // Add task if we have both topic and title
-            if (currentTopic && taskTitle.trim()) {
+            if (currentTopic && taskTitle) {
                 tasks.push({
-                    title: taskTitle.trim(),
+                    title: taskTitle,
                     topic: currentTopic,
                     links: links
                 });
