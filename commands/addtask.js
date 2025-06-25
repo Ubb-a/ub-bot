@@ -5,16 +5,19 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'addtask',
     description: 'Add a new task to a roadmap',
-    usage: 'addtask <roadmap_name> <week_number> , <task_title> , <task_description>',
+    usage: 'addtask <roadmap_name> <week_number> <task_title> [link: <url>]',
     
     async execute(message, args) {
         try {
-            // Check if user has manage roles permission
-            if (!message.member.permissions.has('ManageRoles')) {
+            // Check if user is mentioned or has manage roles permission
+            const mentionedUsers = message.mentions.users;
+            const hasManageRoles = message.member.permissions.has('ManageRoles');
+            
+            if (!hasManageRoles && !mentionedUsers.has(message.author.id)) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ ممنوع الوصول')
-                    .setDescription('محتاج صلاحية "إدارة الأدوار" عشان تضيف مهام.')
+                    .setDescription('محتاج صلاحية "إدارة الأدوار" أو منشن عشان تضيف مهام.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -24,58 +27,45 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ معلومات ناقصة')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 , تعلم HTML , أساسيات HTML\`\n\n**ملاحظة:** رقم الأسبوع مطلوب من 1 لـ 52.`)
+                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 تعلم HTML\` أو \`addtask web-dev 2 تعلم HTML link: https://example.com\`\n\n**ملاحظة:** رقم الأسبوع من 1 لـ 52.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
             const fullArgs = args.join(' ');
             
-            // Split by first space to separate roadmap+week from the rest
-            const firstSpaceIndex = fullArgs.indexOf(' ');
-            if (firstSpaceIndex === -1) {
+            if (args.length < 3) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ استخدام خاطئ')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 , تعلم HTML , أساسيات HTML\``)
+                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 تعلم HTML\``)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            const roadmapAndWeek = fullArgs.substring(0, firstSpaceIndex).trim();
-            const taskParts = fullArgs.substring(firstSpaceIndex + 1).split(',').map(part => part.trim());
-
-            // Parse roadmap name and week number
-            const roadmapWeekParts = roadmapAndWeek.split(' ');
-            if (roadmapWeekParts.length < 2) {
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(COLORS.RED)
-                    .setTitle('❌ استخدام خاطئ')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 , تعلم HTML , أساسيات HTML\``)
-                    .setTimestamp();
-                return message.reply({ embeds: [errorEmbed] });
+            // Parse roadmap name, week number, and task title
+            const roadmapName = args[0];
+            const weekNumber = parseInt(args[1]);
+            
+            // Check for link in the text
+            let taskTitle = args.slice(2).join(' ');
+            let taskLink = null;
+            
+            if (taskTitle.includes('link:')) {
+                const linkIndex = taskTitle.indexOf('link:');
+                const beforeLink = taskTitle.substring(0, linkIndex).trim();
+                const afterLink = taskTitle.substring(linkIndex + 5).trim();
+                
+                taskTitle = beforeLink;
+                taskLink = afterLink;
             }
-
-            const weekNumber = parseInt(roadmapWeekParts.pop()); // Last part is week number
-            const roadmapName = roadmapWeekParts.join(' '); // Rest is roadmap name
-
-            if (taskParts.length < 2) {
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(COLORS.RED)
-                    .setTitle('❌ استخدام خاطئ')
-                    .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`addtask web-dev 2 , تعلم HTML , أساسيات HTML\``)
-                    .setTimestamp();
-                return message.reply({ embeds: [errorEmbed] });
-            }
-
-            const [taskTitle, taskDescription] = taskParts;
 
             // Validate inputs
-            if (!roadmapName || !taskTitle || !taskDescription) {
+            if (!roadmapName || !taskTitle) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ بيانات ناقصة')
-                    .setDescription('تأكد من ملء جميع المعلومات المطلوبة.')
+                    .setDescription('تأكد من كتابة اسم الرود ماب ورقم الأسبوع واسم المهمة.')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -103,16 +93,7 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Check if user has required role
-            if (!message.member.roles.cache.has(roadmap.roleId)) {
-                const role = message.guild.roles.cache.get(roadmap.roleId);
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(COLORS.RED)
-                    .setTitle('❌ ممنوع الوصول')
-                    .setDescription(`محتاج رتبة ${role ? role.toString() : 'مطلوبة'} عشان تعدل الرود ماب دي.`)
-                    .setTimestamp();
-                return message.reply({ embeds: [errorEmbed] });
-            }
+            // Skip role check since we're using mentions now
 
             // Create new task with unique emoji - ensure each task has different emoji
             const taskEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', 
@@ -135,7 +116,8 @@ module.exports = {
             const newTask = {
                 id: newTaskId,
                 title: taskTitle,
-                description: taskDescription,
+                description: taskTitle, // Use title as description
+                link: taskLink, // Add link if provided
                 emoji: taskEmoji,
                 status: 'pending',
                 createdBy: message.author.id,
@@ -150,10 +132,16 @@ module.exports = {
             saveRoadmap(roadmapKey, roadmap);
 
             // Create task embed
+            let embedDescription = `**الرود ماب:** ${roadmap.name}\n**المهمة:** ${taskTitle}\n**الأسبوع:** ${weekNumber}\n**الرقم:** ${newTaskId}`;
+            
+            if (taskLink) {
+                embedDescription += `\n**الرابط:** ${taskLink}`;
+            }
+            
             const taskEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
                 .setTitle('✅ تم إضافة المهمة بنجاح!')
-                .setDescription(`**الرود ماب:** ${roadmap.name}\n**المهمة:** ${taskTitle}\n**الوصف:** ${taskDescription}\n**الأسبوع:** ${weekNumber}\n**الرقم:** ${newTaskId}`)
+                .setDescription(embedDescription)
                 .addFields([
                     {
                         name: '💡 طريقة الاستعمال',

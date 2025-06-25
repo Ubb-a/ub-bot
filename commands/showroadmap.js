@@ -138,8 +138,11 @@ module.exports = {
                     }
                     
                     weekText += `${statusEmoji} **${task.id}.** ${task.title}\n`;
-                    if (task.description) {
+                    if (task.description && task.description !== task.title) {
                         weekText += `   ${task.description.substring(0, 60)}${task.description.length > 60 ? '...' : ''}\n`;
+                    }
+                    if (task.link) {
+                        weekText += `   🔗 ${task.link}\n`;
                     }
                     weekText += '\n';
                 });

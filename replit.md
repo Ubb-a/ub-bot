@@ -157,6 +157,14 @@ This is a Discord bot application designed to manage role-based roadmaps within 
     - Added duplicate response prevention with 10-second cooldown per channel
     - Uses message history check instead of presence data (no privileged intents required)
     - Works independently of command system
+  - **UPDATED**: Major system overhaul (June 25, 2025)
+    - Replaced role-based restrictions with mention-based permissions
+    - Removed all commas from commands, now using spaces (except bulkaddtask)
+    - Added link support with "link:" keyword for tasks
+    - Simplified addtask format: roadmap_name week_number task_title [link: url]
+    - Added deletetask command with automatic ID reordering
+    - Enhanced showroadmap to be role-based with smart selection
+    - All tasks now display links when provided
 
 ## Changelog
 
