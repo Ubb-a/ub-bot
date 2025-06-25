@@ -51,7 +51,14 @@ client.on('messageCreate', async (message) => {
     // Check for "زعزوع" mention and respond
     if (message.content.toLowerCase().includes('زعزوع')) {
         try {
-            await message.reply('سيبوه في حاله الراجل غلبان');
+            // Try to find ub.d user in the server
+            const ubdUser = message.guild.members.cache.find(member => 
+                member.user.username.toLowerCase().includes('ub.d') || 
+                member.displayName.toLowerCase().includes('ub.d')
+            );
+            
+            const mentionText = ubdUser ? `<@${ubdUser.user.id}>` : '@ub.d';
+            await message.reply(`سيبوه في حاله الراجل نايم او تعبان او ايه مش فاكر كان قايلي ايه بس علي العموم هيرد اول ما يرجع ${mentionText}`);
         } catch (error) {
             console.error('Error replying to زعزوع mention:', error);
         }

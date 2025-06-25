@@ -131,7 +131,8 @@ This is a Discord bot application designed to manage role-based roadmaps within 
   - Bot is online and serving Discord servers
   - **NEW**: Added Arabic response feature for "زعزوع" mentions
     - Bot automatically detects "زعزوع" in any message (case-insensitive)
-    - Responds with "سيبوه في حاله الراجل غلبان" when detected
+    - Responds with custom message indicating person is sleeping/tired and will reply when back
+    - Automatically finds and mentions ub.d user in the server
     - Works independently of command system
 
 ## Changelog
