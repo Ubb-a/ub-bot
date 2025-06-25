@@ -4,8 +4,8 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 
 module.exports = {
     name: 'bulkaddtask',
-    description: 'Add multiple tasks to a roadmap at once',
-    usage: 'bulkaddtask <roadmap_name> <week_number> , <task1> , <task2> , <task3>',
+    description: 'Add multiple tasks to a roadmap at once with topics and optional links',
+    usage: 'bulkaddtask <roadmap_name> <week_number> T:<topic> task1 link:url1,url2 task2 T:<new_topic> task3...',
     
     async execute(message, args) {
         try {
@@ -24,44 +24,38 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Missing Arguments')
-                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number , task1 , task2 , task3`\n**Example:** `bulkaddtask backend 2 , Learn Node.js , Setup Database , Create API`')
+                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number T:<topic> task1 link:url1,url2 task2 T:<new_topic> task3`\n**Example:** `bulkaddtask backend 2 T:Node.js Learn basics link:url1,url2 Setup server T:Database Create models`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Parse input using comma as separator
             const fullInput = args.join(' ');
             
-            // Split by first space to separate roadmap+week from the rest
-            const firstSpaceIndex = fullInput.indexOf(' ');
-            if (firstSpaceIndex === -1) {
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(COLORS.RED)
-                    .setTitle('❌ Wrong Format')
-                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number , task1 , task2`')
-                    .setTimestamp();
-                return message.reply({ embeds: [errorEmbed] });
-            }
-
-            const roadmapAndWeek = fullInput.substring(0, firstSpaceIndex).trim();
-            const taskParts = fullInput.substring(firstSpaceIndex + 1).split(',').map(part => part.trim());
-
             // Parse roadmap name and week number
-            const roadmapWeekParts = roadmapAndWeek.split(' ');
-            if (roadmapWeekParts.length < 2) {
+            const parts = fullInput.split(' ');
+            if (parts.length < 3) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Wrong Format')
-                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number , task1 , task2`')
+                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number T:<topic> task1 task2`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            const weekNumber = parseInt(roadmapWeekParts.pop());
-            const roadmapName = roadmapWeekParts.join(' ');
-            const taskTitles = taskParts.filter(task => task.length > 0);
+            // Find where the week number is (it should be a number)
+            let weekIndex = -1;
+            let weekNumber = NaN;
+            
+            for (let i = 1; i < parts.length; i++) {
+                const num = parseInt(parts[i]);
+                if (!isNaN(num) && num >= 1 && num <= 52) {
+                    weekNumber = num;
+                    weekIndex = i;
+                    break;
+                }
+            }
 
-            if (isNaN(weekNumber) || weekNumber < 1 || weekNumber > 52) {
+            if (weekIndex === -1) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Invalid Week Number')
@@ -70,11 +64,26 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            if (taskTitles.length === 0) {
+            const roadmapName = parts.slice(0, weekIndex).join(' ');
+            const tasksInput = parts.slice(weekIndex + 1).join(' ');
+
+            if (!tasksInput.trim()) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ No Tasks Provided')
-                    .setDescription('Please provide at least one task title.')
+                    .setDescription('Please provide at least one task with a topic.')
+                    .setTimestamp();
+                return message.reply({ embeds: [errorEmbed] });
+            }
+
+            // Parse tasks with topics and links
+            const parsedTasks = this.parseTasksInput(tasksInput);
+            
+            if (parsedTasks.length === 0) {
+                const errorEmbed = new EmbedBuilder()
+                    .setColor(COLORS.RED)
+                    .setTitle('❌ No Valid Tasks Found')
+                    .setDescription('Please provide tasks in the correct format: T:<topic> task1 link:url1,url2 task2')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -103,42 +112,20 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Prepare emoji pool
-            const taskEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', 
-                               '📝', '📚', '💻', '🔧', '⚡', '🎯', '🚀', '💡', '🔥', '⭐', 
-                               '🎨', '📊', '🛠️', '🔍', '📱', '🌟', '💰', '🎵', '🏆', '🎮',
-                               '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫', '⚪', '🟤', '🔸'];
-
-            // Get used emojis
-            const usedEmojis = roadmap.tasks.map(task => task.emoji);
-            let availableEmojis = taskEmojis.filter(emoji => !usedEmojis.includes(emoji));
-
-            // Check if we have enough emojis
-            if (availableEmojis.length < taskTitles.length) {
-                const errorEmbed = new EmbedBuilder()
-                    .setColor(COLORS.YELLOW)
-                    .setTitle('⚠️ Too Many Tasks')
-                    .setDescription(`You can only add ${availableEmojis.length} more tasks to this roadmap (emoji limit reached).`)
-                    .setTimestamp();
-                return message.reply({ embeds: [errorEmbed] });
-            }
-
             // Create tasks
             const newTasks = [];
             let currentTaskId = roadmap.tasks.length > 0 ? Math.max(...roadmap.tasks.map(t => t.id)) + 1 : 1;
 
-            for (let i = 0; i < taskTitles.length; i++) {
-                const taskTitle = taskTitles[i];
-                const taskEmoji = availableEmojis[i];
-
+            for (const taskData of parsedTasks) {
                 const newTask = {
                     id: currentTaskId,
-                    title: taskTitle,
-                    description: taskTitle, // Use title as description for bulk add
-                    emoji: taskEmoji,
+                    title: taskData.title,
+                    description: taskData.title,
                     status: 'pending',
                     createdBy: message.author.id,
                     weekNumber: weekNumber,
+                    topic: taskData.topic,
+                    links: taskData.links,
                     createdAt: new Date().toISOString(),
                     completedBy: [],
                     hiddenBy: []
@@ -156,27 +143,39 @@ module.exports = {
             const successEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
                 .setTitle('✅ Bulk Tasks Added Successfully!')
-                .setDescription(`Added ${newTasks.length} tasks to the "${roadmap.name}" roadmap`)
+                .setDescription(`Added ${newTasks.length} tasks to the "${roadmap.name}" roadmap for Week ${weekNumber}`)
                 .setTimestamp()
                 .setFooter({
                     text: `Total tasks in roadmap: ${roadmap.tasks.length}`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 
-            // Add task list to embed
-            let taskList = '';
-            for (let i = 0; i < Math.min(newTasks.length, 10); i++) {
-                const task = newTasks[i];
-                taskList += `${task.emoji} **${task.title}**\n`;
-            }
+            // Group tasks by topic for display
+            const tasksByTopic = {};
+            newTasks.forEach(task => {
+                if (!tasksByTopic[task.topic]) {
+                    tasksByTopic[task.topic] = [];
+                }
+                tasksByTopic[task.topic].push(task);
+            });
 
-            if (newTasks.length > 10) {
-                taskList += `\n*... and ${newTasks.length - 10} more tasks*`;
+            // Add task list to embed grouped by topic
+            let taskList = '';
+            for (const [topic, tasks] of Object.entries(tasksByTopic)) {
+                taskList += `**${topic}:**\n`;
+                tasks.forEach(task => {
+                    taskList += `  ${task.id}. ${task.title}`;
+                    if (task.links && task.links.length > 0) {
+                        taskList += ` 🔗`;
+                    }
+                    taskList += '\n';
+                });
+                taskList += '\n';
             }
 
             successEmbed.addFields({
                 name: '📋 Added Tasks',
-                value: taskList,
+                value: taskList.trim() || 'No tasks to display',
                 inline: false
             });
 
@@ -191,5 +190,65 @@ module.exports = {
         } catch (err) {
             console.error('Error in bulkaddtask command:', err);
         }
+    },
+
+    parseTasksInput(input) {
+        const tasks = [];
+        let currentTopic = null;
+        
+        // Split input by spaces but keep track of links
+        const tokens = input.split(' ');
+        let i = 0;
+        
+        while (i < tokens.length) {
+            const token = tokens[i];
+            
+            // Check if this is a topic definition
+            if (token.startsWith('T:')) {
+                currentTopic = token.substring(2);
+                i++;
+                continue;
+            }
+            
+            // Check if this is a link definition
+            if (token.startsWith('link:')) {
+                // This shouldn't happen at the start, skip
+                i++;
+                continue;
+            }
+            
+            // This should be a task title
+            if (currentTopic) {
+                let taskTitle = '';
+                let links = [];
+                
+                // Collect task title until we hit a link or next topic
+                while (i < tokens.length && !tokens[i].startsWith('T:') && !tokens[i].startsWith('link:')) {
+                    if (taskTitle) taskTitle += ' ';
+                    taskTitle += tokens[i];
+                    i++;
+                }
+                
+                // Check if next token is a link
+                if (i < tokens.length && tokens[i].startsWith('link:')) {
+                    const linkData = tokens[i].substring(5); // Remove 'link:'
+                    links = linkData.split(',').map(link => link.trim()).filter(link => link.length > 0);
+                    i++;
+                }
+                
+                if (taskTitle.trim()) {
+                    tasks.push({
+                        title: taskTitle.trim(),
+                        topic: currentTopic,
+                        links: links
+                    });
+                }
+            } else {
+                // No topic defined yet, skip this token
+                i++;
+            }
+        }
+        
+        return tasks;
     }
 };
