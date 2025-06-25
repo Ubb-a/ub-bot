@@ -150,7 +150,7 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
-Primary language: English
+Primary language: Arabic
 Bot usage: Discord roadmap management with role-based access
 System design: Number-based task completion (no emojis)
 Smart role detection: Auto-show tasks for user's role without specifying roadmap name
