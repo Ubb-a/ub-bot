@@ -80,12 +80,23 @@ module.exports = {
                 return message.reply({ embeds: [errorEmbed] });
             }
 
-            // Create new task with unique emoji - using simple emojis that work better with Discord
-            const taskEmojis = ['📝', '📚', '💻', '🔧', '⚡', '🎯', '🚀', '💡', '🔥', '⭐', 
-                               '🎨', '📊', '🛠️', '🔍', '📱', '🌟', '💰', '🎵', '🏆', '🎮'];
+            // Create new task with unique emoji - ensure each task has different emoji
+            const taskEmojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', 
+                               '📝', '📚', '💻', '🔧', '⚡', '🎯', '🚀', '💡', '🔥', '⭐', 
+                               '🎨', '📊', '🛠️', '🔍', '📱', '🌟', '💰', '🎵', '🏆', '🎮',
+                               '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫', '⚪', '🟤', '🔸'];
+            
+            // Find first unused emoji in this roadmap
+            let taskEmoji = '📝';
+            const usedEmojis = roadmap.tasks.map(task => task.emoji);
+            for (const emoji of taskEmojis) {
+                if (!usedEmojis.includes(emoji)) {
+                    taskEmoji = emoji;
+                    break;
+                }
+            }
             
             const newTaskId = roadmap.tasks.length > 0 ? Math.max(...roadmap.tasks.map(t => t.id)) + 1 : 1;
-            const taskEmoji = taskEmojis[Math.min(newTaskId - 1, taskEmojis.length - 1)];
             
             const newTask = {
                 id: newTaskId,

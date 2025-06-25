@@ -53,40 +53,43 @@ client.on('messageReactionAdd', async (reaction, user) => {
         const userId = user.id;
         const emojiName = reaction.emoji.name;
         
-        // Find roadmap by searching all roadmaps for this emoji
-        const allRoadmaps = getRoadmaps();
+        // Find roadmap by checking the message context first
         let targetRoadmap = null;
         let roadmapKey = '';
         
-        // Search through all roadmaps in this guild
-        for (const [key, roadmap] of Object.entries(allRoadmaps)) {
-            if (key.startsWith(`${guild.id}_`) && roadmap.tasks) {
-                // Check if any task has this emoji
-                const taskWithEmoji = roadmap.tasks.find(task => task.emoji === emojiName);
-                if (taskWithEmoji) {
-                    targetRoadmap = roadmap;
-                    roadmapKey = key;
-                    console.log('✅ Found roadmap with emoji:', roadmap.name, 'task:', taskWithEmoji.title);
-                    break;
+        // Try to extract roadmap from embed first (more reliable)
+        if (message.embeds && message.embeds.length > 0) {
+            const embed = message.embeds[0];
+            const embedTitle = embed.title;
+            
+            if (embedTitle && embedTitle.includes('مهام خريطة:')) {
+                const roadmapName = embedTitle.split('مهام خريطة: ')[1];
+                roadmapKey = `${guild.id}_${roadmapName.toLowerCase()}`;
+                targetRoadmap = getRoadmap(roadmapKey);
+                console.log('📋 Found roadmap from embed:', roadmapName);
+            }
+        }
+        
+        // If no roadmap found from embed, search all roadmaps
+        if (!targetRoadmap) {
+            const allRoadmaps = getRoadmaps();
+            
+            // Search through all roadmaps in this guild
+            for (const [key, roadmap] of Object.entries(allRoadmaps)) {
+                if (key.startsWith(`${guild.id}_`) && roadmap.tasks) {
+                    // Check if any task has this emoji
+                    const taskWithEmoji = roadmap.tasks.find(task => task.emoji === emojiName);
+                    if (taskWithEmoji) {
+                        targetRoadmap = roadmap;
+                        roadmapKey = key;
+                        console.log('✅ Found roadmap with emoji:', roadmap.name, 'task:', taskWithEmoji.title);
+                        break;
+                    }
                 }
             }
         }
         
-        // Handle hide emoji (❌) separately - applies to any roadmap message
-        if (emojiName === '❌' && !targetRoadmap) {
-            // Try to extract roadmap from embed
-            if (message.embeds && message.embeds.length > 0) {
-                const embed = message.embeds[0];
-                const embedTitle = embed.title;
-                
-                if (embedTitle && embedTitle.includes('مهام خريطة:')) {
-                    const roadmapName = embedTitle.split('مهام خريطة: ')[1];
-                    roadmapKey = `${guild.id}_${roadmapName.toLowerCase()}`;
-                    targetRoadmap = getRoadmap(roadmapKey);
-                    console.log('📋 Found roadmap for hide:', roadmapName);
-                }
-            }
-        }
+
         
         if (!targetRoadmap) {
             console.log('❌ No roadmap found for emoji:', emojiName);
@@ -123,32 +126,66 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 message.channel.send({ embeds: [hideEmbed] }).catch(console.error);
             }
         } else {
-            // Handle task completion
-            const taskWithEmoji = targetRoadmap.tasks.find(task => task.emoji === emojiName);
+            // Handle task completion - check all tasks with this emoji
+            const tasksWithEmoji = targetRoadmap.tasks.filter(task => task.emoji === emojiName);
             
-            if (taskWithEmoji) {
-                if (!taskWithEmoji.completedBy) taskWithEmoji.completedBy = [];
+            if (tasksWithEmoji.length > 0) {
+                // If multiple tasks have same emoji, we need to determine which one from the message context
+                let taskToComplete = null;
                 
-                if (!taskWithEmoji.completedBy.includes(userId)) {
-                    taskWithEmoji.completedBy.push(userId);
-                    updated = true;
-                    
-                    console.log('🎉 Task completed by user:', userId, 'Task:', taskWithEmoji.title);
-                    
-                    const completionEmbed = new EmbedBuilder()
-                        .setColor(COLORS.GREEN)
-                        .setTitle('🎉 تهانينا!')
-                        .setDescription(`لقد قمت بتمييز المهمة "${taskWithEmoji.emoji} ${taskWithEmoji.title}" كمكتملة!`)
-                        .addFields({
-                            name: '📊 التقدم',
-                            value: `إجمالي من أنجز هذه المهمة: ${taskWithEmoji.completedBy.length} شخص`,
-                            inline: false
-                        })
-                        .setTimestamp();
-                    
-                    message.channel.send({ embeds: [completionEmbed] }).catch(console.error);
+                if (tasksWithEmoji.length === 1) {
+                    taskToComplete = tasksWithEmoji[0];
                 } else {
-                    console.log('⚠️ Task already completed by this user');
+                    // Multiple tasks with same emoji - check message embed for context
+                    if (message.embeds && message.embeds.length > 0) {
+                        const embed = message.embeds[0];
+                        const embedFields = embed.fields || [];
+                        
+                        // Find the field that contains this emoji and matches a task
+                        for (const field of embedFields) {
+                            if (field.name && field.name.includes(emojiName)) {
+                                // Extract task title from field name
+                                const fieldTitle = field.name.split(emojiName)[1]?.trim();
+                                if (fieldTitle) {
+                                    taskToComplete = tasksWithEmoji.find(task => 
+                                        field.name.includes(task.title)
+                                    );
+                                    if (taskToComplete) break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // If still not found, default to first task with this emoji
+                    if (!taskToComplete) {
+                        taskToComplete = tasksWithEmoji[0];
+                    }
+                }
+                
+                if (taskToComplete) {
+                    if (!taskToComplete.completedBy) taskToComplete.completedBy = [];
+                    
+                    if (!taskToComplete.completedBy.includes(userId)) {
+                        taskToComplete.completedBy.push(userId);
+                        updated = true;
+                        
+                        console.log('🎉 Task completed by user:', userId, 'Task:', taskToComplete.title);
+                        
+                        const completionEmbed = new EmbedBuilder()
+                            .setColor(COLORS.GREEN)
+                            .setTitle('🎉 تهانينا!')
+                            .setDescription(`لقد قمت بتمييز المهمة "${taskToComplete.emoji} ${taskToComplete.title}" كمكتملة!`)
+                            .addFields({
+                                name: '📊 التقدم',
+                                value: `إجمالي من أنجز هذه المهمة: ${taskToComplete.completedBy.length} شخص`,
+                                inline: false
+                            })
+                            .setTimestamp();
+                        
+                        message.channel.send({ embeds: [completionEmbed] }).catch(console.error);
+                    } else {
+                        console.log('⚠️ Task already completed by this user');
+                    }
                 }
             }
         }
