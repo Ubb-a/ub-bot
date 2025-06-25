@@ -14,7 +14,7 @@ module.exports = {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
                 .setTitle('❌ ممنوع الوصول')
-                .setDescription('تحتاج صلاحية "إدارة الأدوار" لإنشاء خرائط الطريق.')
+                .setDescription('محتاج صلاحية "إدارة الأدوار" عشان تعمل رود ماب.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -71,8 +71,8 @@ module.exports = {
         if (!roadmapName.trim()) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ اسم خاطئ للخريطة')
-                .setDescription('من فضلك اكتب اسم صحيح لخريطة الطريق.')
+                .setTitle('❌ اسم خاطئ للرود ماب')
+                .setDescription('اكتب اسم صحيح للرود ماب من فضلك.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -104,8 +104,8 @@ module.exports = {
         if (existingRoadmaps[roadmapKey]) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ الخريطة موجودة بالفعل')
-                .setDescription(`خريطة طريق بالاسم "**${roadmapName}**" موجودة بالفعل في هذا السيرفر.`)
+                .setTitle('❌ الرود ماب موجودة فعلا')
+                .setDescription(`رود ماب بالاسم "**${roadmapName}**" موجودة فعلا في السيرفر ده.`)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -124,7 +124,7 @@ module.exports = {
                 {
                     id: 1,
                     title: 'البداية',
-                    description: 'مرحباً بك في خريطة الطريق الجديدة! يمكنك إضافة المهام باستخدام أوامر إدارة المهام.',
+                    description: 'مرحباً بك في الرود ماب الجديدة! يمكنك إضافة المهام باستخدام أوامر إدارة المهام.',
                     status: 'pending',
                     createdAt: new Date().toISOString()
                 }
@@ -137,8 +137,8 @@ module.exports = {
             
             const successEmbed = new EmbedBuilder()
                 .setColor(COLORS.GREEN)
-                .setTitle('✅ تم إنشاء خريطة الطريق بنجاح!')
-                .setDescription(`**اسم الخريطة:** ${roadmapName}\n**الرول المطلوب:** ${role}\n**تم الإنشاء بواسطة:** ${message.author}\n\nيمكن للأعضاء الذين لديهم رول ${role} الوصول لهذه الخريطة باستخدام \`!myroadmaps\` و \`!showroadmap ${roadmapName}\``)
+                .setTitle('✅ تم عمل الرود ماب بنجاح!')
+                .setDescription(`**اسم الرود ماب:** ${roadmapName}\n**الرتبة المطلوبة:** ${role}\n**تم العمل بواسطة:** ${message.author}\n\nالناس اللي عندها رتبة ${role} تقدر توصل للرود ماب دي باستخدام \`!myroadmaps\` و \`!showroadmap ${roadmapName}\``)
                 .setTimestamp();
             
             return message.reply({ embeds: [successEmbed] });
@@ -148,7 +148,7 @@ module.exports = {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
                 .setTitle('❌ فشل في الإنشاء')
-                .setDescription('حدث خطأ أثناء إنشاء خريطة الطريق. حاول مرة أخرى.')
+                .setDescription('حصل خطأ وأنت بتعمل الرود ماب. جرب تاني.')
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }

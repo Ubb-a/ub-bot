@@ -23,7 +23,7 @@ module.exports = {
             if (args.length === 0) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ اسم الخريطة مفقود')
+                    .setTitle('❌ اسم الرود ماب مفقود')
                     .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!taskstats تطوير-المواقع\``)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
@@ -39,8 +39,8 @@ module.exports = {
             if (!roadmap) {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
-                    .setTitle('❌ الخريطة غير موجودة')
-                    .setDescription(`لا توجد خريطة طريق بالاسم "${roadmapName}" في هذا السيرفر.`)
+                    .setTitle('❌ الرود ماب مش موجودة')
+                    .setDescription(`مفيش رود ماب بالاسم "${roadmapName}" في السيرفر ده.`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -51,7 +51,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.YELLOW)
                     .setTitle('📋 لا توجد مهام')
-                    .setDescription(`لا توجد مهام في خريطة "${roadmap.name}".`)
+                    .setDescription(`مفيش مهام في الرود ماب "${roadmap.name}".`)
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }

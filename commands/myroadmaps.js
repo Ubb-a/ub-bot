@@ -31,7 +31,7 @@ module.exports = {
         // Create embed response
         const embed = new EmbedBuilder()
             .setColor(COLORS.BLURPLE)
-            .setTitle('🗺️ خرائط الطريق المتاحة لك')
+            .setTitle('🗺️ الرود ماب الموجودة عندك')
             .setAuthor({
                 name: message.author.tag,
                 iconURL: message.author.displayAvatarURL({ dynamic: true })
@@ -43,10 +43,10 @@ module.exports = {
             });
 
         if (accessibleRoadmaps.length === 0) {
-            embed.setDescription('❌ **لا توجد خرائط طريق متاحة**\n\nليس لديك صلاحية للوصول لأي خرائط في هذا السيرفر. اتصل بالإدارة للحصول على الأدوار المطلوبة.')
+            embed.setDescription('❌ **مفيش رود ماب متاحة**\n\nمش مسموح لك توصل لأي رود ماب في السيرفر ده. كلم الأدمن عشان تاخد الرتبة المطلوبة.')
                 .setColor(COLORS.RED);
         } else {
-            let description = `لديك صلاحية الوصول إلى **${accessibleRoadmaps.length}** خريطة طريق:\n\n`;
+            let description = `عندك صلاحية توصل لـ **${accessibleRoadmaps.length}** رود ماب:\n\n`;
             
             accessibleRoadmaps.forEach((roadmap, index) => {
                 const role = message.guild.roles.cache.get(roadmap.roleId);
@@ -65,7 +65,7 @@ module.exports = {
         // Add helpful commands section
         embed.addFields({
             name: '💡 الأوامر المتاحة',
-            value: '`!showroadmap <اسم>` - عرض تفاصيل الخريطة\n`!create <اسم> role:@رول` - إنشاء خريطة جديدة (يتطلب صلاحية إدارة الأدوار)',
+            value: '`!showroadmap <اسم>` - شوف تفاصيل الرود ماب\n`!create <اسم> role:@رول` - عمل رود ماب جديدة (محتاج صلاحية إدارة الأدوار)',
             inline: false
         });
         

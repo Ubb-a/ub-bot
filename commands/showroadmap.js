@@ -13,7 +13,7 @@ module.exports = {
         if (args.length === 0) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ اسم الخريطة مفقود')
+                .setTitle('❌ اسم الرود ماب مفقود')
                 .setDescription(`**الاستخدام:** ${this.usage}\n**مثال:** \`!showroadmap تطوير-المواقع\``)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
@@ -32,8 +32,8 @@ module.exports = {
         if (!roadmap) {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
-                .setTitle('❌ الخريطة غير موجودة')
-                .setDescription(`لا توجد خريطة طريق بالاسم "**${roadmapName}**" في هذا السيرفر.\n\nاستخدم \`!myroadmaps\` لرؤية الخرائط المتاحة.`)
+                .setTitle('❌ الرود ماب مش موجودة')
+                .setDescription(`مفيش رود ماب بالاسم "**${roadmapName}**" في السيرفر ده.\n\nاستعمل \`!myroadmaps\` عشان تشوف الرود ماب الموجودة.`)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -44,7 +44,7 @@ module.exports = {
             const errorEmbed = new EmbedBuilder()
                 .setColor(COLORS.RED)
                 .setTitle('❌ ممنوع الوصول')
-                .setDescription(`ليس لديك صلاحية لعرض هذه الخريطة.\n\n**الرول المطلوب:** ${role ? role.toString() : 'الرول غير موجود'}`)
+                .setDescription(`مش مسموح ليك تشوف الرود ماب دي.\n\n**الرتبة المطلوبة:** ${role ? role.toString() : 'الرتبة مش موجودة'}`)
                 .setTimestamp();
             return message.reply({ embeds: [errorEmbed] });
         }
@@ -90,7 +90,7 @@ module.exports = {
             )
             .setTimestamp()
             .setFooter({
-                text: `${message.guild.name} | معرف الخريطة: ${roadmap.id}`,
+                text: `${message.guild.name} | معرف الرود ماب: ${roadmap.id}`,
                 iconURL: message.guild.iconURL({ dynamic: true })
             });
         
