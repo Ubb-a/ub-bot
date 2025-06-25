@@ -5,7 +5,7 @@ const { getRoadmap, saveRoadmap } = require('../utils/dataManager');
 module.exports = {
     name: 'bulkaddtask',
     description: 'Add multiple tasks to a roadmap at once with topics and optional links',
-    usage: 'bulkaddtask <roadmap_name> <week_number> T:<topic> task1 link:url1,url2 task2 T:<new_topic> task3...',
+    usage: 'bulkaddtask <roadmap_name> <week_number> T:<topic> task1 link:url1|url2 , task2 T:<new_topic> task3...',
     
     async execute(message, args) {
         try {
@@ -24,7 +24,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setColor(COLORS.RED)
                     .setTitle('❌ Missing Arguments')
-                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number T:<topic> task1 link:url1,url2 task2 T:<new_topic> task3`\n**Example:** `bulkaddtask backend 2 T:Node.js Learn basics link:url1,url2 Setup server T:Database Create models`')
+                    .setDescription('**Usage:** `bulkaddtask roadmap_name week_number T:<topic> task1 link:url1|url2 , task2 T:<new_topic> task3`\n**Example:** `bulkaddtask backend 2 T:Node.js Learn basics link:url1|url2 , Setup server T:Database Create models`')
                     .setTimestamp();
                 return message.reply({ embeds: [errorEmbed] });
             }
@@ -194,58 +194,46 @@ module.exports = {
 
     parseTasksInput(input) {
         const tasks = [];
+        
+        // First split by commas to separate tasks
+        const taskParts = input.split(',').map(part => part.trim());
         let currentTopic = null;
         
-        // Split input by spaces but keep track of links
-        const tokens = input.split(' ');
-        let i = 0;
-        
-        while (i < tokens.length) {
-            const token = tokens[i];
+        for (const taskPart of taskParts) {
+            if (!taskPart) continue;
             
-            // Check if this is a topic definition
-            if (token.startsWith('T:')) {
-                currentTopic = token.substring(2);
-                i++;
-                continue;
+            const tokens = taskPart.split(' ');
+            let taskTitle = '';
+            let links = [];
+            
+            for (let i = 0; i < tokens.length; i++) {
+                const token = tokens[i];
+                
+                // Check if this is a topic definition
+                if (token.startsWith('T:')) {
+                    currentTopic = token.substring(2);
+                    continue;
+                }
+                
+                // Check if this is a link definition
+                if (token.startsWith('link:')) {
+                    const linkData = token.substring(5); // Remove 'link:'
+                    links = linkData.split('|').map(link => link.trim()).filter(link => link.length > 0);
+                    continue;
+                }
+                
+                // This is part of the task title
+                if (taskTitle) taskTitle += ' ';
+                taskTitle += token;
             }
             
-            // Check if this is a link definition
-            if (token.startsWith('link:')) {
-                // This shouldn't happen at the start, skip
-                i++;
-                continue;
-            }
-            
-            // This should be a task title
-            if (currentTopic) {
-                let taskTitle = '';
-                let links = [];
-                
-                // Collect task title until we hit a link or next topic
-                while (i < tokens.length && !tokens[i].startsWith('T:') && !tokens[i].startsWith('link:')) {
-                    if (taskTitle) taskTitle += ' ';
-                    taskTitle += tokens[i];
-                    i++;
-                }
-                
-                // Check if next token is a link
-                if (i < tokens.length && tokens[i].startsWith('link:')) {
-                    const linkData = tokens[i].substring(5); // Remove 'link:'
-                    links = linkData.split(',').map(link => link.trim()).filter(link => link.length > 0);
-                    i++;
-                }
-                
-                if (taskTitle.trim()) {
-                    tasks.push({
-                        title: taskTitle.trim(),
-                        topic: currentTopic,
-                        links: links
-                    });
-                }
-            } else {
-                // No topic defined yet, skip this token
-                i++;
+            // Add task if we have both topic and title
+            if (currentTopic && taskTitle.trim()) {
+                tasks.push({
+                    title: taskTitle.trim(),
+                    topic: currentTopic,
+                    links: links
+                });
             }
         }
         
