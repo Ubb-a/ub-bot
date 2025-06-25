@@ -112,4 +112,6 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
+Primary language: Arabic (العربية)
+Bot usage: Discord roadmap management for Arabic-speaking community
 ```
