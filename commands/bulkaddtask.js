@@ -194,42 +194,49 @@ module.exports = {
 
     parseTasksInput(input) {
         const tasks = [];
-        
-        // First split by commas to separate tasks
-        const taskParts = input.split(',').map(part => part.trim());
         let currentTopic = null;
         
-        for (const taskPart of taskParts) {
-            if (!taskPart) continue;
+        // Split by comma first to get individual task entries
+        const entries = input.split(',');
+        
+        for (let entry of entries) {
+            entry = entry.trim();
+            if (!entry) continue;
             
-            let workingPart = taskPart;
+            let taskTitle = '';
             let links = [];
             
-            // Check for topic definition first
-            const topicMatch = workingPart.match(/T:([^\s]+)/);
-            if (topicMatch) {
-                currentTopic = topicMatch[1];
-                workingPart = workingPart.replace(/T:[^\s]+\s*/, '').trim();
+            // Check if this entry contains a new topic
+            if (entry.includes('T:')) {
+                const topicStart = entry.indexOf('T:');
+                const topicEnd = entry.indexOf(' ', topicStart);
+                
+                if (topicEnd === -1) {
+                    // Topic is at the end, no task in this entry
+                    currentTopic = entry.substring(topicStart + 2).trim();
+                    continue;
+                } else {
+                    // Extract topic and remove it from entry
+                    currentTopic = entry.substring(topicStart + 2, topicEnd);
+                    entry = entry.substring(0, topicStart) + entry.substring(topicEnd + 1);
+                    entry = entry.trim();
+                }
             }
             
-            // Extract links if present - find 'link:' and capture everything until end or next word
-            const linkIndex = workingPart.indexOf('link:');
-            if (linkIndex !== -1) {
-                // Get the part before 'link:' as task title
-                const beforeLink = workingPart.substring(0, linkIndex).trim();
+            // Check if this entry contains links
+            if (entry.includes('link:')) {
+                const linkStart = entry.indexOf('link:');
+                const linkPart = entry.substring(linkStart + 5).trim();
                 
-                // Get the part after 'link:' as links
-                const afterLink = workingPart.substring(linkIndex + 5).trim();
+                // Split links by pipe
+                links = linkPart.split('|').map(link => link.trim()).filter(link => link.length > 0);
                 
-                // Split links by pipe and clean them
-                links = afterLink.split('|').map(link => link.trim()).filter(link => link.length > 0);
-                
-                // Use the part before 'link:' as task title
-                workingPart = beforeLink;
+                // Extract task title (everything before 'link:')
+                taskTitle = entry.substring(0, linkStart).trim();
+            } else {
+                // No links, entire entry is task title
+                taskTitle = entry.trim();
             }
-            
-            // What's left should be the task title
-            const taskTitle = workingPart.trim();
             
             // Add task if we have both topic and title
             if (currentTopic && taskTitle) {
