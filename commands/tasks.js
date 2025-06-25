@@ -71,45 +71,40 @@ module.exports = {
                 .setDescription(`إجمالي المهام المرئية: ${visibleTasks.length}`)
                 .setTimestamp()
                 .setFooter({
-                    text: `${message.guild.name} | اضغط على الإيموجي للتفاعل`,
+                    text: `${message.guild.name} | استخدم !done رقم_المهمة`,
                     iconURL: message.guild.iconURL({ dynamic: true })
                 });
 
-            // Add each task as a field with reactions
-            for (let i = 0; i < Math.min(visibleTasks.length, 10); i++) {
+            // Add each task as a field with numbers
+            for (let i = 0; i < Math.min(visibleTasks.length, 15); i++) {
                 const task = visibleTasks[i];
                 const isCompleted = task.completedBy && task.completedBy.includes(userId);
                 const statusEmoji = isCompleted ? '✅' : '⏳';
-                const taskEmoji = task.emoji || '📝';
+                const taskNumber = i + 1;
                 
                 embed.addFields({
-                    name: `${statusEmoji} ${taskEmoji} ${task.title}`,
-                    value: `**الوصف:** ${task.description}\n**الرقم:** ${task.id}\n**تاريخ الإنشاء:** ${new Date(task.createdAt).toLocaleDateString('ar-EG')}\n\n${taskEmoji} - مكتملة | ❌ - إخفاء`,
+                    name: `${statusEmoji} ${taskNumber}. ${task.title}`,
+                    value: `**الوصف:** ${task.description}\n**الرقم:** ${task.id}\n**تاريخ الإنشاء:** ${new Date(task.createdAt).toLocaleDateString('ar-EG')}`,
                     inline: false
                 });
             }
 
-            if (visibleTasks.length > 10) {
+            if (visibleTasks.length > 15) {
                 embed.addFields({
                     name: '📌 ملاحظة',
-                    value: `يتم عرض أول 10 مهام فقط. إجمالي المهام: ${visibleTasks.length}`,
+                    value: `يتم عرض أول 15 مهمة فقط. إجمالي المهام: ${visibleTasks.length}`,
                     inline: false
                 });
             }
 
-            const replyMessage = await message.reply({ embeds: [embed] });
-            
-            // Add reactions for each visible task (up to 10) using their unique emojis
-            const tasksToShow = visibleTasks.slice(0, 10);
-            
-            // Add each task's unique emoji as reaction
-            for (const task of tasksToShow) {
-                const taskEmoji = task.emoji || '📝';
-                await replyMessage.react(taskEmoji).catch(console.error);
-            }
-            
-            // Add hide reaction
-            await replyMessage.react('❌').catch(console.error);
+            // Add instructions for completing tasks
+            embed.addFields({
+                name: '💡 كيفية الاستخدام',
+                value: `لتمييز مهمة كمكتملة، اكتب: \`!done رقم_المهمة\`\nمثال: \`!done 2\` لتمييز المهمة رقم 2 كمكتملة`,
+                inline: false
+            });
+
+            await message.reply({ embeds: [embed] });
 
             // Store interaction data in message (for reaction handler)
             // We'll handle this in the bot.js reaction handler
