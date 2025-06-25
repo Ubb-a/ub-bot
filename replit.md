@@ -100,6 +100,7 @@ This is a Discord bot application designed to manage role-based roadmaps within 
   - Configured Express web server for monitoring and API endpoints
   - Successfully connected Discord bot with proper intents
   - Bot is online and serving Discord servers
+  - **Issue identified**: Bot requires "Message Content Intent" enabled in Discord Developer Portal to read commands
 
 ## Changelog
 
